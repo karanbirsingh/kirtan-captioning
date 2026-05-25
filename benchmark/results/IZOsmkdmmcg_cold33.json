@@ -1,0 +1,153 @@
+{
+  "video_id": "IZOsmkdmmcg",
+  "shabad_id": 3643,
+  "segments": [
+    {
+      "start": 266.1,
+      "end": 284.1,
+      "line_idx": 11
+    },
+    {
+      "start": 284.1,
+      "end": 286.1,
+      "line_idx": 10
+    },
+    {
+      "start": 286.1,
+      "end": 288.1,
+      "line_idx": 15
+    },
+    {
+      "start": 288.1,
+      "end": 292.1,
+      "line_idx": 10
+    },
+    {
+      "start": 292.1,
+      "end": 310.1,
+      "line_idx": 15
+    },
+    {
+      "start": 310.1,
+      "end": 312.1,
+      "line_idx": 1
+    },
+    {
+      "start": 312.1,
+      "end": 314.1,
+      "line_idx": 13
+    },
+    {
+      "start": 314.1,
+      "end": 340.1,
+      "line_idx": 1
+    },
+    {
+      "start": 340.1,
+      "end": 344.1,
+      "line_idx": 10
+    },
+    {
+      "start": 344.1,
+      "end": 352.1,
+      "line_idx": 12
+    },
+    {
+      "start": 352.1,
+      "end": 354.1,
+      "line_idx": 10
+    },
+    {
+      "start": 354.1,
+      "end": 356.1,
+      "line_idx": 1
+    },
+    {
+      "start": 356.1,
+      "end": 360.1,
+      "line_idx": 12
+    },
+    {
+      "start": 360.1,
+      "end": 370.1,
+      "line_idx": 1
+    },
+    {
+      "start": 370.1,
+      "end": 378.1,
+      "line_idx": 12
+    },
+    {
+      "start": 378.1,
+      "end": 380.1,
+      "line_idx": 11
+    },
+    {
+      "start": 380.1,
+      "end": 384.1,
+      "line_idx": 12
+    },
+    {
+      "start": 384.1,
+      "end": 396.1,
+      "line_idx": 13
+    },
+    {
+      "start": 396.1,
+      "end": 418.1,
+      "line_idx": 1
+    },
+    {
+      "start": 418.1,
+      "end": 420.1,
+      "line_idx": 14
+    },
+    {
+      "start": 420.1,
+      "end": 426.1,
+      "line_idx": 17
+    },
+    {
+      "start": 426.1,
+      "end": 436.1,
+      "line_idx": 16
+    },
+    {
+      "start": 436.1,
+      "end": 438.1,
+      "line_idx": 18
+    },
+    {
+      "start": 438.1,
+      "end": 440.1,
+      "line_idx": 15
+    },
+    {
+      "start": 440.1,
+      "end": 444.1,
+      "line_idx": 1
+    },
+    {
+      "start": 444.1,
+      "end": 448.1,
+      "line_idx": 11
+    },
+    {
+      "start": 448.1,
+      "end": 452.1,
+      "line_idx": 18
+    },
+    {
+      "start": 452.1,
+      "end": 456.1,
+      "line_idx": 17
+    },
+    {
+      "start": 456.1,
+      "end": 458.0,
+      "line_idx": 1
+    }
+  ],
+  "lock_time": 260.1,
+  "mode": "blind"
+}

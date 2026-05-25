@@ -1,0 +1,103 @@
+{
+  "video_id": "IZOsmkdmmcg",
+  "shabad_id": 4377,
+  "segments": [
+    {
+      "start": 20.0,
+      "end": 50.0,
+      "line_idx": 1
+    },
+    {
+      "start": 50.0,
+      "end": 76.0,
+      "line_idx": 2
+    },
+    {
+      "start": 76.0,
+      "end": 100.0,
+      "line_idx": 1
+    },
+    {
+      "start": 100.0,
+      "end": 102.0,
+      "line_idx": 6
+    },
+    {
+      "start": 102.0,
+      "end": 136.0,
+      "line_idx": 3
+    },
+    {
+      "start": 136.0,
+      "end": 144.0,
+      "line_idx": 6
+    },
+    {
+      "start": 144.0,
+      "end": 174.0,
+      "line_idx": 4
+    },
+    {
+      "start": 174.0,
+      "end": 192.0,
+      "line_idx": 1
+    },
+    {
+      "start": 192.0,
+      "end": 216.0,
+      "line_idx": 2
+    },
+    {
+      "start": 216.0,
+      "end": 246.0,
+      "line_idx": 1
+    },
+    {
+      "start": 246.0,
+      "end": 284.0,
+      "line_idx": 5
+    },
+    {
+      "start": 284.0,
+      "end": 310.0,
+      "line_idx": 6
+    },
+    {
+      "start": 310.0,
+      "end": 332.0,
+      "line_idx": 1
+    },
+    {
+      "start": 332.0,
+      "end": 358.0,
+      "line_idx": 2
+    },
+    {
+      "start": 358.0,
+      "end": 376.0,
+      "line_idx": 1
+    },
+    {
+      "start": 376.0,
+      "end": 400.0,
+      "line_idx": 2
+    },
+    {
+      "start": 400.0,
+      "end": 426.0,
+      "line_idx": 1
+    },
+    {
+      "start": 426.0,
+      "end": 442.0,
+      "line_idx": 6
+    },
+    {
+      "start": 442.0,
+      "end": 458.0,
+      "line_idx": 1
+    }
+  ],
+  "lock_time": 18.0,
+  "mode": "blind"
+}

@@ -1,0 +1,59 @@
+[package]
+name = "gurbani-captioning-shell"
+version = "0.2.0"
+description = "Gurbani Captioning desktop shell — wraps the Python sidecar in a native window"
+authors = ["Karanbir Singh"]
+edition = "2021"
+rust-version = "1.77.2"
+
+# Single binary that boots the bundled sidecar, parses BANI_READY port=,
+# and opens a WebView at http://127.0.0.1:<port>/mic/. No npm, no
+# JS bundler, no Vite — Tauri's frontend "asset server" is the Python
+# sidecar itself, so we point distDir at a stub and let the shell
+# navigate to localhost on launch.
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["devtools"] }
+tauri-plugin-shell = "2"
+# tauri-plugin-log: file-based logging to ~/Library/Logs/Gurbani Captioning/.
+# Survives app crash; readable without Terminal launching. Both the Rust shell
+# and (indirectly via stdout/stderr capture) the Python sidecar end up here.
+tauri-plugin-log = "2"
+log = "0.4"
+# tauri-plugin-single-instance: second launch of the app focuses the existing
+# window instead of starting a parallel shell + sidecar. Prevents orphan
+# sidecars from accidental double-launch (was a real issue during dev — see
+# server.py BANI_SHELL_PID watchdog).
+tauri-plugin-single-instance = "2"
+# tauri-plugin-updater: deferred until we have minisign keys + GitHub Releases
+# manifest set up. The in-page banner in mic.html covers user-facing update
+# notifications meanwhile. To re-enable: generate keys, add plugins.updater
+# config to tauri.conf.json, then uncomment the dep + plugin registration.
+# tauri-plugin-updater = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# urlencoding: tiny crate used by main.rs::navigate_to_error to encode
+# multi-line sidecar log tails into the ?log= query param of error.html.
+urlencoding = "2"
+
+# macOS-only: needed to flip private WKPreferences keys
+# (`mediaDevicesEnabled` and friends) so `navigator.mediaDevices` is
+# exposed to the WebView. Without this WKWebView returns `undefined`
+# for mediaDevices on http://127.0.0.1 origins, breaking getUserMedia.
+# Versions pinned to match what tauri 2.11 / wry 0.55 already pull
+# in (see Cargo.lock — keeping them aligned avoids duplicate crates).
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-foundation = "0.3"
+objc2-web-kit = { version = "0.3", features = ["WKWebView", "WKWebViewConfiguration", "WKPreferences"] }
+
+[features]
+# This feature is used for production builds where `devUrl` points at the
+# bundled binary. With `default = ["custom-protocol"]` Tauri serves the
+# stub frontend from disk via a tauri:// protocol; we never actually use
+# it (we navigate to http://127.0.0.1:<port>/mic/ on boot) but Tauri
+# requires *some* frontend to exist.
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

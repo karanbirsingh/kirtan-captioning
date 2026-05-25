@@ -1,0 +1,38 @@
+{
+  "video_id": "kZhIA8P6xWI",
+  "shabad_id": 1821,
+  "segments": [
+    {
+      "start": 243.5,
+      "end": 255.5,
+      "line_idx": 9
+    },
+    {
+      "start": 255.5,
+      "end": 257.5,
+      "line_idx": 3
+    },
+    {
+      "start": 257.5,
+      "end": 275.5,
+      "line_idx": 10
+    },
+    {
+      "start": 275.5,
+      "end": 285.5,
+      "line_idx": 3
+    },
+    {
+      "start": 285.5,
+      "end": 303.5,
+      "line_idx": 4
+    },
+    {
+      "start": 303.5,
+      "end": 306.0,
+      "line_idx": 3
+    }
+  ],
+  "lock_time": 241.5,
+  "mode": "blind"
+}

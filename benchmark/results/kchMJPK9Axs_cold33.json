@@ -1,0 +1,68 @@
+{
+  "video_id": "kchMJPK9Axs",
+  "shabad_id": 1341,
+  "segments": [
+    {
+      "start": 261.0,
+      "end": 277.0,
+      "line_idx": 3
+    },
+    {
+      "start": 277.0,
+      "end": 293.0,
+      "line_idx": 5
+    },
+    {
+      "start": 293.0,
+      "end": 295.0,
+      "line_idx": 10
+    },
+    {
+      "start": 295.0,
+      "end": 319.0,
+      "line_idx": 5
+    },
+    {
+      "start": 319.0,
+      "end": 357.0,
+      "line_idx": 6
+    },
+    {
+      "start": 357.0,
+      "end": 401.0,
+      "line_idx": 3
+    },
+    {
+      "start": 401.0,
+      "end": 425.0,
+      "line_idx": 7
+    },
+    {
+      "start": 425.0,
+      "end": 461.0,
+      "line_idx": 8
+    },
+    {
+      "start": 461.0,
+      "end": 507.0,
+      "line_idx": 3
+    },
+    {
+      "start": 507.0,
+      "end": 567.0,
+      "line_idx": 9
+    },
+    {
+      "start": 567.0,
+      "end": 621.0,
+      "line_idx": 10
+    },
+    {
+      "start": 621.0,
+      "end": 650.0,
+      "line_idx": 3
+    }
+  ],
+  "lock_time": 259.0,
+  "mode": "blind"
+}

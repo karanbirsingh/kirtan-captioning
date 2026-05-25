@@ -1,0 +1,15 @@
+# Core engine
+aiohttp>=3.9
+numpy>=1.24
+rapidfuzz>=3.0
+
+# ASR backend (OnnxBackend — the default shipped backend)
+onnxruntime>=1.16
+sentencepiece>=0.1.99
+
+# Model download from HuggingFace
+huggingface_hub>=0.20
+
+# Benchmark client (optional — only needed for benchmark/benchmark_client.py)
+# websockets>=12.0
+# soundfile>=0.12

@@ -1,0 +1,43 @@
+{
+  "video_id": "zOtIpxMT9hU",
+  "shabad_id": 3712,
+  "segments": [
+    {
+      "start": 190.0,
+      "end": 208.0,
+      "line_idx": 5
+    },
+    {
+      "start": 208.0,
+      "end": 228.0,
+      "line_idx": 6
+    },
+    {
+      "start": 228.0,
+      "end": 234.0,
+      "line_idx": 4
+    },
+    {
+      "start": 234.0,
+      "end": 258.0,
+      "line_idx": 6
+    },
+    {
+      "start": 258.0,
+      "end": 268.0,
+      "line_idx": 1
+    },
+    {
+      "start": 268.0,
+      "end": 282.0,
+      "line_idx": 5
+    },
+    {
+      "start": 282.0,
+      "end": 289.0,
+      "line_idx": 7
+    }
+  ],
+  "lock_time": 188.0,
+  "mode": "blind"
+}

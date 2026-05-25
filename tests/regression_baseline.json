@@ -1,0 +1,523 @@
+[
+ {
+  "type": "candidates",
+  "phase": "identifying",
+  "candidates": [
+   {
+    "shabad_id": 1368,
+    "name": "ੴ ਸਤਿ ਨਾਮੁ ਕਰਤਾ ਪੁਰਖੁ ਨਿਰਭਉ ਨਿਰਵੈਰੁ ਅਕਾਲ ਮੂਰਤਿ ਅਜੂਨੀ ਸੈਭੰ ਗੁ",
+    "score": 66.0,
+    "rank": 1,
+    "matched_line_index": 1,
+    "matched_line_text": "ਰਾਗੁ ਆਸਾ ਮਹਲਾ ੧ ਘਰੁ ੧ ਸੋ ਦਰੁ ॥",
+    "matched_line_transliteration": "raag aasaa mahalaa pehilaa ghar pehilaa so dhar ||",
+    "matched_line_score": 50.0
+   },
+   {
+    "shabad_id": 1387,
+    "name": "ਆਸਾ ਮਹਲਾ ੧ ਤਿਤੁਕਾ ॥",
+    "score": 66.0,
+    "rank": 2,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੧ ਤਿਤੁਕਾ ॥",
+    "matched_line_transliteration": "aasaa mahalaa pehilaa titukaa ||",
+    "matched_line_score": 80.0
+   },
+   {
+    "shabad_id": 1388,
+    "name": "ਆਸਾ ਮਹਲਾ ੧ ਪੰਚਪਦੇ ॥",
+    "score": 66.0,
+    "rank": 3,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੧ ਪੰਚਪਦੇ ॥",
+    "matched_line_transliteration": "aasaa mahalaa pehilaa pa(n)chapadhe ||",
+    "matched_line_score": 80.0
+   },
+   {
+    "shabad_id": 1392,
+    "name": "ਆਸਾ ਮਹਲਾ ੧ ਪੰਚਪਦੇ ॥",
+    "score": 66.0,
+    "rank": 4,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੧ ਪੰਚਪਦੇ ॥",
+    "matched_line_transliteration": "aasaa mahalaa pehilaa pa(n)chapadhe ||",
+    "matched_line_score": 80.0
+   },
+   {
+    "shabad_id": 1419,
+    "name": "ਆਸਾ ਮਹਲਾ ੩ ਪੰਚਪਦੇ ॥",
+    "score": 66.0,
+    "rank": 5,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੩ ਪੰਚਪਦੇ ॥",
+    "matched_line_transliteration": "aasaa mahalaa teejaa pa(n)chapadhe ||",
+    "matched_line_score": 80.0
+   },
+   {
+    "shabad_id": 1448,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ਪੰਚਪਦੇ ॥",
+    "score": 66.0,
+    "rank": 6,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ਪੰਚਪਦੇ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa pa(n)chapadhe ||",
+    "matched_line_score": 80.0
+   },
+   {
+    "shabad_id": 1449,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ਇਕਤੁਕੇ ੨ ॥",
+    "score": 66.0,
+    "rank": 7,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ਇਕਤੁਕੇ ੨ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa ikatuke 2 ||",
+    "matched_line_score": 80.0
+   },
+   {
+    "shabad_id": 1450,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+    "score": 66.0,
+    "rank": 8,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa ||",
+    "matched_line_score": 100.0
+   },
+   {
+    "shabad_id": 1517,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ਦੁਤੁਕੇ ੯ ॥",
+    "score": 66.0,
+    "rank": 9,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ਦੁਤੁਕੇ ੯ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa dhutuke 9 ||",
+    "matched_line_score": 80.0
+   },
+   {
+    "shabad_id": 1526,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ਪੰਚਪਦਾ ॥",
+    "score": 66.0,
+    "rank": 10,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ਪੰਚਪਦਾ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa pa(n)chapadhaa ||",
+    "matched_line_score": 80.0
+   }
+  ],
+  "previous_locked_shabad_id": null,
+  "confidence": 0.0,
+  "locked": false,
+  "raw_asr": "ਆਸਾਮਹਲਾ੫॥"
+ },
+ {
+  "type": "candidates",
+  "phase": "identifying",
+  "candidates": [
+   {
+    "shabad_id": 1512,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+    "score": 67.8,
+    "rank": 1,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa ||",
+    "matched_line_score": 66.66666666666666
+   },
+   {
+    "shabad_id": 1388,
+    "name": "ਆਸਾ ਮਹਲਾ ੧ ਪੰਚਪਦੇ ॥",
+    "score": 58.5,
+    "rank": 2,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੧ ਪੰਚਪਦੇ ॥",
+    "matched_line_transliteration": "aasaa mahalaa pehilaa pa(n)chapadhe ||",
+    "matched_line_score": 57.14285714285715
+   },
+   {
+    "shabad_id": 1392,
+    "name": "ਆਸਾ ਮਹਲਾ ੧ ਪੰਚਪਦੇ ॥",
+    "score": 58.5,
+    "rank": 3,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੧ ਪੰਚਪਦੇ ॥",
+    "matched_line_transliteration": "aasaa mahalaa pehilaa pa(n)chapadhe ||",
+    "matched_line_score": 57.14285714285715
+   },
+   {
+    "shabad_id": 1419,
+    "name": "ਆਸਾ ਮਹਲਾ ੩ ਪੰਚਪਦੇ ॥",
+    "score": 58.5,
+    "rank": 4,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੩ ਪੰਚਪਦੇ ॥",
+    "matched_line_transliteration": "aasaa mahalaa teejaa pa(n)chapadhe ||",
+    "matched_line_score": 57.14285714285715
+   },
+   {
+    "shabad_id": 1448,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ਪੰਚਪਦੇ ॥",
+    "score": 58.5,
+    "rank": 5,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ਪੰਚਪਦੇ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa pa(n)chapadhe ||",
+    "matched_line_score": 57.14285714285715
+   },
+   {
+    "shabad_id": 1526,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ਪੰਚਪਦਾ ॥",
+    "score": 58.5,
+    "rank": 6,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ਪੰਚਪਦਾ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa pa(n)chapadhaa ||",
+    "matched_line_score": 57.14285714285715
+   },
+   {
+    "shabad_id": 1387,
+    "name": "ਆਸਾ ਮਹਲਾ ੧ ਤਿਤੁਕਾ ॥",
+    "score": 54.7,
+    "rank": 7,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੧ ਤਿਤੁਕਾ ॥",
+    "matched_line_transliteration": "aasaa mahalaa pehilaa titukaa ||",
+    "matched_line_score": 57.14285714285715
+   },
+   {
+    "shabad_id": 1449,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ਇਕਤੁਕੇ ੨ ॥",
+    "score": 54.7,
+    "rank": 8,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ਇਕਤੁਕੇ ੨ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa ikatuke 2 ||",
+    "matched_line_score": 57.14285714285715
+   },
+   {
+    "shabad_id": 1517,
+    "name": "ਆਸਾ ਮਹਲਾ ੫ ਦੁਤੁਕੇ ੯ ॥",
+    "score": 54.7,
+    "rank": 9,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੫ ਦੁਤੁਕੇ ੯ ॥",
+    "matched_line_transliteration": "aasaa mahalaa panjavaa dhutuke 9 ||",
+    "matched_line_score": 57.14285714285715
+   },
+   {
+    "shabad_id": 1608,
+    "name": "ਆਸਾ ਮਹਲਾ ੧ ਇਕਤੁਕੀ ॥",
+    "score": 54.7,
+    "rank": 10,
+    "matched_line_index": 0,
+    "matched_line_text": "ਆਸਾ ਮਹਲਾ ੧ ਇਕਤੁਕੀ ॥",
+    "matched_line_transliteration": "aasaa mahalaa pehilaa ikatukee ||",
+    "matched_line_score": 57.14285714285715
+   }
+  ],
+  "previous_locked_shabad_id": null,
+  "confidence": 0.93,
+  "locked": false,
+  "raw_asr": "ਆਸਾਮਹਲਾ੫॥ ਚਰਨਕਮਲਕੀਆਸਪਿਆਰੇ॥"
+ },
+ {
+  "type": "locked",
+  "phase": "tracking",
+  "shabad_id": 1512,
+  "shabad_name": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+  "total_lines": 11,
+  "lines": [
+   {
+    "index": 1,
+    "text": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+    "transliteration": "aasaa mahalaa panjavaa ||"
+   },
+   {
+    "index": 2,
+    "text": "ਚਰਨ ਕਮਲ ਕੀ ਆਸ ਪਿਆਰੇ ॥",
+    "transliteration": "charan kamal kee aas piaare ||"
+   },
+   {
+    "index": 3,
+    "text": "ਜਮਕੰਕਰ ਨਸਿ ਗਏ ਵਿਚਾਰੇ ॥੧॥",
+    "transliteration": "jamaka(n)kar nas ge vichaare ||1||"
+   },
+   {
+    "index": 4,
+    "text": "ਤੂ ਚਿਤਿ ਆਵਹਿ ਤੇਰੀ ਮਇਆ ॥",
+    "transliteration": "too chit aaveh teree miaa ||"
+   },
+   {
+    "index": 5,
+    "text": "ਸਿਮਰਤ ਨਾਮ ਸਗਲ ਰੋਗ ਖਇਆ ॥੧॥ ਰਹਾਉ ॥",
+    "transliteration": "simarat naam sagal rog khiaa ||1|| rahaau ||"
+   },
+   {
+    "index": 6,
+    "text": "ਅਨਿਕ ਦੂਖ ਦੇਵਹਿ ਅਵਰਾ ਕਉ ॥",
+    "transliteration": "anik dhookh dheveh avaraa kau ||"
+   },
+   {
+    "index": 7,
+    "text": "ਪਹੁਚਿ ਨ ਸਾਕਹਿ ਜਨ ਤੇਰੇ ਕਉ ॥੨॥",
+    "transliteration": "pahuch na saakeh jan tere kau ||2||"
+   },
+   {
+    "index": 8,
+    "text": "ਦਰਸ ਤੇਰੇ ਕੀ ਪਿਆਸ ਮਨਿ ਲਾਗੀ ॥",
+    "transliteration": "dharas tere kee piaas man laagee ||"
+   },
+   {
+    "index": 9,
+    "text": "ਸਹਜ ਅਨੰਦ ਬਸੈ ਬੈਰਾਗੀ ॥੩॥",
+    "transliteration": "sahaj ana(n)dh basai bairaagee ||3||"
+   },
+   {
+    "index": 10,
+    "text": "ਨਾਨਕ ਕੀ ਅਰਦਾਸਿ ਸੁਣੀਜੈ ॥",
+    "transliteration": "naanak kee aradhaas suneejai ||"
+   },
+   {
+    "index": 11,
+    "text": "ਕੇਵਲ ਨਾਮੁ ਰਿਦੇ ਮਹਿ ਦੀਜੈ ॥੪॥੨੬॥੭੭॥",
+    "transliteration": "keval naam ridhe meh dheejai ||4||26||77||"
+   }
+  ],
+  "confidence": 1.0
+ },
+ {
+  "type": "locked",
+  "phase": "tracking",
+  "shabad_id": 1512,
+  "shabad_name": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+  "total_lines": 11,
+  "lines": [
+   {
+    "index": 1,
+    "text": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+    "transliteration": "aasaa mahalaa panjavaa ||"
+   },
+   {
+    "index": 2,
+    "text": "ਚਰਨ ਕਮਲ ਕੀ ਆਸ ਪਿਆਰੇ ॥",
+    "transliteration": "charan kamal kee aas piaare ||"
+   },
+   {
+    "index": 3,
+    "text": "ਜਮਕੰਕਰ ਨਸਿ ਗਏ ਵਿਚਾਰੇ ॥੧॥",
+    "transliteration": "jamaka(n)kar nas ge vichaare ||1||"
+   },
+   {
+    "index": 4,
+    "text": "ਤੂ ਚਿਤਿ ਆਵਹਿ ਤੇਰੀ ਮਇਆ ॥",
+    "transliteration": "too chit aaveh teree miaa ||"
+   },
+   {
+    "index": 5,
+    "text": "ਸਿਮਰਤ ਨਾਮ ਸਗਲ ਰੋਗ ਖਇਆ ॥੧॥ ਰਹਾਉ ॥",
+    "transliteration": "simarat naam sagal rog khiaa ||1|| rahaau ||"
+   },
+   {
+    "index": 6,
+    "text": "ਅਨਿਕ ਦੂਖ ਦੇਵਹਿ ਅਵਰਾ ਕਉ ॥",
+    "transliteration": "anik dhookh dheveh avaraa kau ||"
+   },
+   {
+    "index": 7,
+    "text": "ਪਹੁਚਿ ਨ ਸਾਕਹਿ ਜਨ ਤੇਰੇ ਕਉ ॥੨॥",
+    "transliteration": "pahuch na saakeh jan tere kau ||2||"
+   },
+   {
+    "index": 8,
+    "text": "ਦਰਸ ਤੇਰੇ ਕੀ ਪਿਆਸ ਮਨਿ ਲਾਗੀ ॥",
+    "transliteration": "dharas tere kee piaas man laagee ||"
+   },
+   {
+    "index": 9,
+    "text": "ਸਹਜ ਅਨੰਦ ਬਸੈ ਬੈਰਾਗੀ ॥੩॥",
+    "transliteration": "sahaj ana(n)dh basai bairaagee ||3||"
+   },
+   {
+    "index": 10,
+    "text": "ਨਾਨਕ ਕੀ ਅਰਦਾਸਿ ਸੁਣੀਜੈ ॥",
+    "transliteration": "naanak kee aradhaas suneejai ||"
+   },
+   {
+    "index": 11,
+    "text": "ਕੇਵਲ ਨਾਮੁ ਰਿਦੇ ਮਹਿ ਦੀਜੈ ॥੪॥੨੬॥੭੭॥",
+    "transliteration": "keval naam ridhe meh dheejai ||4||26||77||"
+   }
+  ],
+  "confidence": 1.0,
+  "manual": true
+ },
+ {
+  "type": "line_update",
+  "phase": "tracking",
+  "shabad_id": 1512,
+  "current_line": 1,
+  "verse_id": 17756,
+  "total_lines": 11,
+  "line_text": "ਆਸਾ ਮਹਲਾ ੫ ॥",
+  "confidence": 1.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਆਸਾਮਹਲਾ੫॥ ਚਰਨਕਮਲਕੀਆਸਪਿਆਰੇ॥",
+  "current_line": 1,
+  "content_cursor": 26.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਆਸਾਮਹਲਾ੫॥ ਚਰਨਕਮਲਕੀਆਸਪਿਆਰੇ॥",
+  "current_line": 1,
+  "content_cursor": 28.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਆਸਾਮਹਲਾ੫॥ ਚਰਨਕਮਲਕੀਆਸਪਿਆਰੇ॥ ਜਮਕੰਕਰਨਸਿਗਏਵਿਚਾਰੇ॥੧॥",
+  "current_line": 1,
+  "content_cursor": 30.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਆਸਾਮਹਲਾ੫॥ ਚਰਨਕਮਲਕੀਆਸਪਿਆਰੇ॥ ਜਮਕੰਕਰਨਸਿਗਏਵਿਚਾਰੇ॥੧॥",
+  "current_line": 1,
+  "content_cursor": 32.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਚਰਨਕਮਲਕੀਆਸਪਿਆਰੇ॥ ਜਮਕੰਕਰਨਸਿਗਏਵਿਚਾਰੇ॥੧॥ ਤੂਚਿਤਿਆਵਹਿਤੇਰੀਮਇਆ॥",
+  "current_line": 1,
+  "content_cursor": 34.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਚਰਨਕਮਲਕੀਆਸਪਿਆਰੇ॥ ਜਮਕੰਕਰਨਸਿਗਏਵਿਚਾਰੇ॥੧॥ ਤੂਚਿਤਿਆਵਹਿਤੇਰੀਮਇਆ॥",
+  "current_line": 1,
+  "content_cursor": 36.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਜਮਕੰਕਰਨਸਿਗਏਵਿਚਾਰੇ॥੧॥ ਤੂਚਿਤਿਆਵਹਿਤੇਰੀਮਇਆ॥ ਸਿਮਰਤਨਾਮਸਗਲਰੋਗਖਇਆ॥੧॥ਰਹਾਉ॥",
+  "current_line": 1,
+  "content_cursor": 38.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਜਮਕੰਕਰਨਸਿਗਏਵਿਚਾਰੇ॥੧॥ ਤੂਚਿਤਿਆਵਹਿਤੇਰੀਮਇਆ॥ ਸਿਮਰਤਨਾਮਸਗਲਰੋਗਖਇਆ॥੧॥ਰਹਾਉ॥",
+  "current_line": 1,
+  "content_cursor": 40.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਤੂਚਿਤਿਆਵਹਿਤੇਰੀਮਇਆ॥ ਸਿਮਰਤਨਾਮਸਗਲਰੋਗਖਇਆ॥੧॥ਰਹਾਉ॥ ਅਨਿਕਦੂਖਦੇਵਹਿਅਵਰਾਕਉ॥",
+  "current_line": 1,
+  "content_cursor": 42.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਤੂਚਿਤਿਆਵਹਿਤੇਰੀਮਇਆ॥ ਸਿਮਰਤਨਾਮਸਗਲਰੋਗਖਇਆ॥੧॥ਰਹਾਉ॥ ਅਨਿਕਦੂਖਦੇਵਹਿਅਵਰਾਕਉ॥",
+  "current_line": 1,
+  "content_cursor": 44.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਸਿਮਰਤਨਾਮਸਗਲਰੋਗਖਇਆ॥੧॥ਰਹਾਉ॥ ਅਨਿਕਦੂਖਦੇਵਹਿਅਵਰਾਕਉ॥ ਪਹੁਚਿਨਸਾਕਹਿਜਨਤੇਰੇਕਉ॥੨॥",
+  "current_line": 1,
+  "content_cursor": 46.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਸਿਮਰਤਨਾਮਸਗਲਰੋਗਖਇਆ॥੧॥ਰਹਾਉ॥ ਅਨਿਕਦੂਖਦੇਵਹਿਅਵਰਾਕਉ॥ ਪਹੁਚਿਨਸਾਕਹਿਜਨਤੇਰੇਕਉ॥੨॥",
+  "current_line": 1,
+  "content_cursor": 48.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਅਨਿਕਦੂਖਦੇਵਹਿਅਵਰਾਕਉ॥ ਪਹੁਚਿਨਸਾਕਹਿਜਨਤੇਰੇਕਉ॥੨॥ ਦਰਸਤੇਰੇਕੀਪਿਆਸਮਨਿਲਾਗੀ॥",
+  "current_line": 1,
+  "content_cursor": 50.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਅਨਿਕਦੂਖਦੇਵਹਿਅਵਰਾਕਉ॥ ਪਹੁਚਿਨਸਾਕਹਿਜਨਤੇਰੇਕਉ॥੨॥ ਦਰਸਤੇਰੇਕੀਪਿਆਸਮਨਿਲਾਗੀ॥",
+  "current_line": 1,
+  "content_cursor": 52.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਪਹੁਚਿਨਸਾਕਹਿਜਨਤੇਰੇਕਉ॥੨॥ ਦਰਸਤੇਰੇਕੀਪਿਆਸਮਨਿਲਾਗੀ॥ ਸਹਜਅਨੰਦਬਸੈਬੈਰਾਗੀ॥੩॥",
+  "current_line": 1,
+  "content_cursor": 54.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਪਹੁਚਿਨਸਾਕਹਿਜਨਤੇਰੇਕਉ॥੨॥ ਦਰਸਤੇਰੇਕੀਪਿਆਸਮਨਿਲਾਗੀ॥ ਸਹਜਅਨੰਦਬਸੈਬੈਰਾਗੀ॥੩॥",
+  "current_line": 1,
+  "content_cursor": 56.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਦਰਸਤੇਰੇਕੀਪਿਆਸਮਨਿਲਾਗੀ॥ ਸਹਜਅਨੰਦਬਸੈਬੈਰਾਗੀ॥੩॥ ਨਾਨਕਕੀਅਰਦਾਸਿਸੁਣੀਜੈ॥",
+  "current_line": 1,
+  "content_cursor": 58.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਦਰਸਤੇਰੇਕੀਪਿਆਸਮਨਿਲਾਗੀ॥ ਸਹਜਅਨੰਦਬਸੈਬੈਰਾਗੀ॥੩॥ ਨਾਨਕਕੀਅਰਦਾਸਿਸੁਣੀਜੈ॥",
+  "current_line": 1,
+  "content_cursor": 60.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਸਹਜਅਨੰਦਬਸੈਬੈਰਾਗੀ॥੩॥ ਨਾਨਕਕੀਅਰਦਾਸਿਸੁਣੀਜੈ॥ ਕੇਵਲਨਾਮੁਰਿਦੇਮਹਿਦੀਜੈ॥੪॥੨੬॥੭੭॥",
+  "current_line": 1,
+  "content_cursor": 62.0
+ },
+ {
+  "type": "status",
+  "phase": "tracking",
+  "reason": "tracking",
+  "raw_asr": "ਸਹਜਅਨੰਦਬਸੈਬੈਰਾਗੀ॥੩॥ ਨਾਨਕਕੀਅਰਦਾਸਿਸੁਣੀਜੈ॥ ਕੇਵਲਨਾਮੁਰਿਦੇਮਹਿਦੀਜੈ॥੪॥੨੬॥੭੭॥",
+  "current_line": 1,
+  "content_cursor": 64.0
+ }
+]

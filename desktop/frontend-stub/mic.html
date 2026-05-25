@@ -1,0 +1,2508 @@
+<!DOCTYPE html>
+<!-- Icon attribution: <a href="https://www.flaticon.com/free-icons/sound-waves" title="sound waves icons">Sound waves icons created by chehuna - Flaticon</a> -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gurbani Captioning</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_puyz7JMrBkPxMhdGi5ZRMiao5V5rQ4Q9aPHtCoJtpoM4', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    autocapture: false,
+    capture_pageview: false,
+  });
+</script>
+<style>
+:root {
+  --bg:#0f1115; --panel:#171a21; --panel-hi:#1e2230; --border:#2a2f3a;
+  --text:#e8ecf1; --muted:#8a93a3; --accent:#60a5fa; --good:#4ade80;
+  --err:#f87171; --font-gurmukhi:"Noto Sans Gurmukhi",system-ui,sans-serif;
+  --gurmukhi-size:32px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif;
+       font-size:16px; line-height:1.5; }
+
+/* While an overlay is open, lock body scroll so wheel events outside
+   the dialog can't move the main page behind. Combined with
+   `overscroll-behavior:contain` on the scrollable child of each overlay
+   (.settings, .search), this kills both pathways: scrolling outside
+   the dialog is a no-op, scrolling inside the dialog stops chaining
+   to the body when it hits the dialog's limit. :has() is Chromium 105+
+   which Edge WebView2 has had since 2022 — safe for desktop. */
+body:has(.settings-overlay.show, .search-overlay.show, .onboard-overlay.show) {
+  overflow: hidden;
+}
+
+/* ─── Header bar ─────────────────────────────────────── */
+.header { display:flex; align-items:center; gap:16px; padding:12px 24px;
+          background:var(--panel); border-bottom:1px solid var(--border);
+          position:sticky; top:0; z-index:10; }
+.header h1 { font-size:18px; font-weight:700; letter-spacing:-0.02em; }
+.header-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+.header .phase { font-size:11px; font-weight:600; padding:3px 10px;
+                 border-radius:12px; text-transform:uppercase; letter-spacing:0.06em; }
+.phase.identifying { background:rgba(96,165,250,0.15); color:var(--accent); }
+.phase.tracking { background:rgba(74,222,128,0.15); color:var(--good); }
+.icon-btn { background:none; border:none; color:var(--muted); cursor:pointer;
+            font-size:18px; padding:6px; border-radius:6px; }
+.icon-btn:hover { color:var(--text); background:var(--panel-hi); }
+
+/* Prototype badge */
+.proto-pill { font-size:10px; font-weight:500; padding:2px 8px; border-radius:8px;
+              background:rgba(96,165,250,0.1); color:var(--accent); border:1px solid rgba(96,165,250,0.2);
+              letter-spacing:0.04em; text-transform:uppercase; }
+.feedback-link { font-size:11px; color:var(--muted); text-decoration:none;
+                 border-bottom:1px dotted var(--border); }
+.feedback-link:hover { color:var(--accent); border-color:var(--accent); }
+
+/* Perf stats */
+.perf-stat { font-size:11px; color:var(--muted); }
+.perf-stat .val { color:var(--accent); font-variant-numeric:tabular-nums; }
+
+/* ─── Status bar ─────────────────────────────────────── */
+.status-bar { display:flex; align-items:center; gap:16px; padding:8px 24px;
+              background:var(--panel); border-bottom:1px solid var(--border);
+              font-size:12px; color:var(--muted); }
+.status-dot { width:8px; height:8px; border-radius:50%; background:var(--border);
+              flex-shrink:0; }
+.status-dot.live { background:var(--good); box-shadow:0 0 6px var(--good); }
+.status-dot.error { background:var(--err); }
+.status-dot.reconnecting { background:var(--accent); animation:pulse 1s infinite; }
+@keyframes pulse { 50% { opacity:0.4; } }
+
+/* Audio level meter */
+.level-meter { display:flex; gap:2px; align-items:flex-end; height:16px; }
+.level-bar { width:3px; background:var(--border); border-radius:1px;
+             transition:height 0.08s ease, background 0.08s ease; }
+.level-bar.active { background:var(--good); }
+.level-bar.low { background:var(--accent); }
+.level-bar.hot { background:var(--err); }
+
+.rec-indicator { display:none; align-items:center; gap:4px; color:var(--err);
+                 font-weight:600; font-size:11px; text-transform:uppercase; }
+.rec-indicator.on { display:flex; }
+.rec-dot { width:6px; height:6px; border-radius:50%; background:var(--err);
+           animation:pulse 1s infinite; }
+
+/* ─── Error banner ───────────────────────────────────── */
+.error-banner { display:none; padding:10px 24px; background:rgba(248,113,113,0.1);
+                border-bottom:1px solid rgba(248,113,113,0.2); color:var(--err);
+                font-size:13px; align-items:center; gap:8px; }
+.error-banner.show { display:flex; }
+.error-banner button { background:none; border:1px solid var(--err); color:var(--err);
+                       padding:2px 10px; border-radius:4px; font-size:12px; cursor:pointer; }
+.error-banner .dismiss { margin-left:auto; background:none; border:none;
+                         color:var(--err); cursor:pointer; font-size:16px; }
+
+/* ─── Main layout ────────────────────────────────────── */
+.main { max-width:800px; margin:0 auto; padding:24px; }
+
+/* ─── Controls ───────────────────────────────────────── */
+.controls { display:flex; gap:10px; align-items:center; margin-bottom:20px; flex-wrap:wrap; }
+button { background:var(--panel); color:var(--text); border:1px solid var(--border);
+         border-radius:8px; padding:10px 20px; font-size:14px; cursor:pointer;
+         transition:all 0.15s ease; }
+button:hover { border-color:var(--accent); background:var(--panel-hi); }
+button:active { transform:scale(0.97); }
+.mic-btn { font-weight:600;
+           background:#f0f0f0; color:#111; border-color:#f0f0f0; }
+.mic-btn:hover { background:#fff; border-color:#fff; }
+.mic-btn.active { background:#ef4444; color:#fff; border-color:#ef4444; }
+.mic-btn.active:hover { background:#dc2626; border-color:#dc2626; }
+
+/* ─── ASR engine pill ──────────────────────────────────────────────── */
+/* Lives in the status bar next to the ASR ms readout, color-coded so
+   a paid backend can't quietly be left on. Click opens the settings
+   overlay to the ASR section. Sized to match `.perf-stat` so it blends
+   into the row instead of looking like a control button. */
+.asr-pill { display:inline-flex; align-items:center; gap:5px;
+            padding:2px 8px; font-size:11px; font-weight:600;
+            border-radius:10px; cursor:pointer; line-height:1.4;
+            background:transparent; border:1px solid currentColor;
+            transition:background 0.15s ease; user-select:none; }
+.asr-pill:hover { background:rgba(255,255,255,0.05); }
+.asr-pill .asr-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+.asr-pill.local { color:#10b981; }   /* green: free, on-device */
+.asr-pill.google { color:#f59e0b; }  /* amber: paid cloud */
+
+/* ─── ASR preview ────────────────────────────────────── */
+.asr-preview { color:var(--muted); font-size:13px; margin-bottom:16px;
+               font-family:var(--font-gurmukhi); min-height:20px;
+               padding:8px 12px; background:var(--panel); border-radius:8px;
+               border:1px solid var(--border); }
+
+/* ─── Main display ───────────────────────────────────── */
+.display { background:var(--panel); border:1px solid var(--border); border-radius:12px;
+           padding:28px; margin-bottom:16px; min-height:180px;
+           box-shadow:0 2px 12px rgba(0,0,0,0.2); }
+.shabad-name { color:var(--muted); font-size:13px; margin-bottom:14px;
+               display:flex; justify-content:space-between; align-items:center; }
+.line-main { font-size:var(--gurmukhi-size); font-weight:500; line-height:1.5;
+             margin-bottom:10px; font-family:var(--font-gurmukhi);
+             transition:opacity 0.2s ease; }
+.line-tr { color:var(--muted); font-size:15px; font-style:italic; margin-bottom:4px; }
+.line-tl { color:var(--muted); font-size:14px; margin-bottom:4px; opacity:0.7; }
+.line-num { color:var(--muted); font-size:12px; }
+
+/* Audio waveform visualization */
+.waveform { display:none; height:64px; margin:12px 0 8px; }
+.waveform.show { display:block; }
+.waveform canvas { width:100%; height:100%; border-radius:6px; display:block; }
+
+/* Listening state feedback */
+.listen-state { display:none; color:var(--muted); font-size:13px; margin-top:8px; align-items:center; gap:6px; }
+.listen-state.show { display:flex; }
+.listen-state .dot { width:6px; height:6px; border-radius:50%;
+                     background:var(--good); animation:pulse 1.5s infinite; }
+.listen-state.warn { color:var(--accent); }
+.listen-state.warn .dot { background:var(--accent); }
+/* Thin progress bar inside #candidatesPanel showing time until next engine
+   tick. Fills over identification_interval (5s) then resets on the next
+   candidates/status event. Subtle but gives the user a "system is alive"
+   signal between actual list refreshes. */
+.panel-tick-bar { height:2px; background:rgba(255,255,255,0.05); border-radius:1px; overflow:hidden; margin:-4px -4px 8px; }
+.panel-tick-bar > span { display:block; height:100%; width:0%; background:var(--accent); opacity:0.5; transition:width linear; }
+
+/* ─── Shabad lines (full view when tracking) ─────────── */
+.shabad-lines { background:var(--panel); border:1px solid var(--border); border-radius:12px;
+                padding:16px; margin-bottom:16px; max-height:300px; overflow-y:auto;
+                display:none; box-shadow:0 2px 12px rgba(0,0,0,0.15); }
+.shabad-lines.show { display:block; }
+.shabad-lines h3 { font-size:12px; color:var(--muted); margin-bottom:10px;
+                   text-transform:uppercase; letter-spacing:0.06em; }
+.shabad-line { padding:8px 12px; border-radius:6px; font-family:var(--font-gurmukhi);
+               font-size:16px; cursor:pointer; transition:background 0.15s ease;
+               display:flex; gap:8px; align-items:baseline; }
+.shabad-line:hover { background:var(--panel-hi); }
+.shabad-line.current { background:rgba(96,165,250,0.12); color:var(--accent); font-weight:600; }
+.shabad-line .ln { color:var(--muted); font-size:11px; min-width:20px; font-family:system-ui; }
+.shabad-line .lt { display:none; }
+
+/* ─── Candidates ─────────────────────────────────────── */
+#candidatesPanel { background:var(--panel); border:1px solid var(--border); border-radius:12px;
+              padding:16px; margin-bottom:16px; max-height:300px; overflow-y:auto; }
+#candidatesPanel h3 { font-size:12px; color:var(--muted); margin-bottom:10px;
+                 text-transform:uppercase; letter-spacing:0.06em; text-align:left; }
+.cand-list { list-style:none; }
+.cand-list li { padding:8px 10px; border-radius:6px; font-size:14px;
+                display:flex; align-items:center; gap:8px; cursor:pointer;
+                transition:background 0.1s ease; border:1px solid transparent;
+                font-family:var(--font-gurmukhi); text-align:left; }
+.cand-list li:hover { background:var(--panel-hi); border-color:var(--accent); }
+.cand-list li[tabindex]:focus { outline:2px solid var(--accent); outline-offset:-2px; }
+/* Optimistic-lock visual: when the user clicks a candidate, we mark it
+   immediately so they don't think the click was lost. Settles when the
+   real `locked` event arrives from the engine (~500ms-2s later). */
+.cand-list li.locking { background:rgba(96,165,250,0.15); border-color:var(--accent); pointer-events:none; }
+.cand-list li.locking .confirm-btn { background:var(--accent); color:#000; }
+/* Persistent "search manually" row at the top of the candidates list.
+   Looks like a candidate row but italic+muted so it reads as an action,
+   not a match. Clicking opens the manual search overlay. */
+.cand-search { color:var(--muted); font-style:italic;
+               border-style:dashed !important; border-color:var(--border) !important;
+               font-family:inherit !important; }
+.cand-search:hover { color:var(--text); border-color:var(--accent) !important; }
+.confirm-btn { font-size:11px; padding:4px 12px; background:transparent; color:var(--accent);
+               border:1px solid var(--accent); border-radius:6px; cursor:pointer;
+               flex-shrink:0; transition:all 0.15s ease; white-space:nowrap; }
+.confirm-btn:hover { background:rgba(96,165,250,0.15); }
+
+/* ─── STTM bar ───────────────────────────────────────── */
+.sttm-bar { display:flex; gap:8px; align-items:center; margin-bottom:16px; flex-wrap:wrap;
+            padding:10px 14px; background:var(--panel); border:1px solid var(--border);
+            border-radius:10px; font-size:13px; }
+.sttm-bar label { font-weight:600; font-size:12px; text-transform:uppercase;
+                  letter-spacing:0.05em; color:var(--muted); }
+.sttm-bar input { background:var(--bg); color:var(--text); border:1px solid var(--border);
+                  border-radius:6px; padding:6px 10px; font-size:13px; width:120px; }
+.sttm-bar input[type=number] { width:70px; }
+.sttm-bar button { font-size:12px; padding:6px 14px; }
+.sttm-bar button.connected { background:rgba(74,222,128,0.15); border-color:var(--good); color:var(--good); }
+.sttm-status { font-size:11px; }
+.sttm-status.ok { color:var(--good); }
+.sttm-status.err { color:var(--err); }
+.sttm-help { color:var(--muted); font-size:11px; cursor:help;
+             border-bottom:1px dotted var(--muted); }
+
+/* ─── Settings panel ─────────────────────────────────── */
+.settings-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+                    z-index:100; }
+.settings-overlay.show { display:flex; justify-content:center; align-items:flex-start;
+                         padding-top:60px; }
+.settings { background:var(--panel); border:1px solid var(--border); border-radius:14px;
+            padding:24px; width:400px; max-width:90vw; max-height:80vh; overflow-y:auto;
+            overscroll-behavior:contain;
+            box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+.settings h2 { font-size:18px; margin-bottom:16px; display:flex; justify-content:space-between; }
+.settings h2 .close { cursor:pointer; color:var(--muted); font-size:20px; }
+.settings h2 .close:hover { color:var(--text); }
+.setting-group { margin-bottom:16px; }
+.setting-group label { display:block; font-size:13px; color:var(--muted); margin-bottom:4px; }
+.setting-group input[type=range] { width:100%; accent-color:var(--accent); }
+.setting-group .val { font-size:12px; color:var(--accent); float:right; }
+.setting-group select, .setting-group input[type=text] {
+  width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border);
+  border-radius:6px; padding:6px 10px; font-size:13px;
+  -webkit-appearance:none; -moz-appearance:none; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a93a3' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center; padding-right:28px; }
+.toggle-row { display:flex; justify-content:space-between; align-items:center;
+              padding:8px 0; border-bottom:1px solid var(--border); }
+.toggle-row:last-child { border:none; }
+.toggle-row span { font-size:13px; }
+.toggle-row .desc { font-size:11px; color:var(--muted); }
+input[type=checkbox] { accent-color:var(--accent); width:18px; height:18px; }
+
+/* ─── Onboarding ─────────────────────────────────────── */
+.onboard-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+                   z-index:200; justify-content:center; align-items:center; }
+.onboard-overlay.show { display:flex; }
+.onboard { background:var(--panel); border:1px solid var(--border); border-radius:14px;
+           padding:32px; width:460px; max-width:90vw; text-align:center;
+           box-shadow:0 8px 32px rgba(0,0,0,0.5); }
+.onboard h2 { font-size:22px; margin-bottom:8px; }
+.onboard p { color:var(--text); font-size:14px; margin-bottom:20px; line-height:1.6; }
+.onboard .steps { text-align:left; margin-bottom:24px; }
+.onboard .step { display:flex; gap:10px; align-items:flex-start; margin-bottom:12px; font-size:14px; }
+.onboard .step-num { background:var(--accent); color:#fff; width:24px; height:24px;
+                     border-radius:50%; display:flex; align-items:center; justify-content:center;
+                     font-weight:700; font-size:12px; flex-shrink:0; }
+.onboard button { background:var(--accent); color:#fff; border:none; border-radius:8px;
+                  padding:12px 32px; font-size:15px; font-weight:600; cursor:pointer; }
+.onboard button:hover { background:#3b82f6; }
+
+/* ─── Scrollbar ──────────────────────────────────────── */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--muted); }
+
+/* ─── Dev panel ───────────────────────────────────────── */
+.dev-panel { position:fixed; bottom:0; left:0; right:0;
+             background:var(--panel); border-top:1px solid var(--border); z-index:50;
+             font-family:"Cascadia Code","Fira Code",monospace; font-size:12px;
+             transition:height 0.2s ease; display:flex; flex-direction:column; }
+.dev-bar { display:flex; align-items:center; gap:8px; padding:4px 16px;
+           background:var(--panel-hi); cursor:pointer; font-size:11px; color:var(--muted);
+           border-bottom:1px solid var(--border); flex-shrink:0; min-height:24px; }
+.dev-bar:hover { background:var(--panel); }
+.dev-bar .tag { color:var(--accent); font-weight:600; text-transform:uppercase;
+                letter-spacing:0.06em; font-size:10px; }
+.dev-bar .arrow { margin-left:auto; font-size:10px; }
+.dev-panel.collapsed { height:24px; }
+.dev-panel.expanded { height:244px; }
+.dev-header { display:flex; align-items:center; gap:12px; padding:4px 16px;
+              background:var(--panel-hi); border-bottom:1px solid var(--border);
+              font-size:11px; color:var(--muted); flex-shrink:0; }
+.dev-header .tag { color:var(--accent); font-weight:600; text-transform:uppercase;
+                   letter-spacing:0.06em; }
+.dev-header .perf { margin-left:auto; display:flex; gap:16px; }
+.dev-header .perf span { color:var(--muted); }
+.dev-header .perf .v { color:var(--text); }
+.dev-log { flex:1; overflow-y:auto; padding:8px 16px; font-size:12px; }
+.dev-log .ev { padding:2px 0; border-bottom:1px solid rgba(42,47,58,0.5);
+               display:flex; gap:8px; min-height:22px; align-items:center; overflow:hidden; }
+.dev-log .ev-ts { color:var(--muted); width:55px; flex-shrink:0; }
+.dev-log .ev-type { width:90px; flex-shrink:0; font-weight:600; }
+.dev-log .ev-type.candidates { color:var(--accent); }
+.dev-log .ev-type.locked { color:var(--good); }
+.dev-log .ev-type.line_update { color:#60a5fa; }
+.dev-log .ev-type.status { color:var(--muted); }
+.dev-log .ev-type.connected { color:#a78bfa; }
+.dev-log .ev-detail { color:var(--muted); overflow:hidden; text-overflow:ellipsis;
+                       white-space:nowrap; flex:1; }
+
+/* When dev panel is open, push main content up */
+body.dev-open .main { padding-bottom:240px; }
+
+/* ─── Search modal ────────────────────────────────── */
+.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+                  z-index:150; justify-content:center; align-items:flex-start; padding-top:60px; }
+.search-overlay.show { display:flex; }
+.search-modal { background:var(--panel); border:1px solid var(--border); border-radius:14px;
+                padding:24px; width:500px; max-width:90vw; max-height:80vh; overflow-y:auto;
+                overscroll-behavior:contain;
+                box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+.search-modal h2 { font-size:18px; margin-bottom:12px; display:flex; justify-content:space-between; }
+.search-modal h2 .close { cursor:pointer; color:var(--muted); font-size:20px; }
+.search-modal h2 .close:hover { color:var(--text); }
+.search-input { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border);
+                border-radius:8px; padding:10px 14px; font-size:15px; margin-bottom:8px;
+                font-family:var(--font-gurmukhi); }
+.search-input:focus { outline:none; border-color:var(--accent); }
+.search-hint { font-size:12px; color:var(--muted); margin-bottom:10px; }
+.search-hint code { background:var(--bg); padding:1px 5px; border-radius:3px; font-size:11px; }
+.search-status { font-size:12px; color:var(--muted); margin-bottom:8px; }
+.search-status.error { color:var(--err); }
+.search-result { padding:10px 12px; border-radius:8px; cursor:pointer; border:none;
+                 background:none; width:100%; text-align:left; color:var(--text);
+                 display:block; margin-bottom:2px; }
+.search-result:hover { background:var(--panel-hi); }
+.search-result .gurm { font-family:var(--font-gurmukhi); font-size:15px; margin-bottom:2px; }
+.search-result .meta { font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ─── Update banner ─────────────────────────────────── -->
+<div id="updateBanner" style="display:none;background:#1e3a5f;color:#93c5fd;text-align:center;padding:8px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border)" onclick="openExternal(this.dataset.url)">
+  New version available: <span id="updateVersion"></span> — click to download
+</div>
+
+<!-- ─── Header ────────────────────────────────────────── -->
+<div class="header">
+  <h1>Kirtan Captioning</h1>
+  <span class="proto-pill">prototype</span>
+  <span class="phase identifying" id="phase" style="display:none">identifying</span>
+  <div class="header-right">
+    <a class="feedback-link" href="#" id="feedbackBtn">feedback</a>
+    <button class="icon-btn" id="helpBtn" title="Help" aria-label="Help">?</button>
+    <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">⚙</button>
+  </div>
+</div>
+
+<!-- ─── Status bar ────────────────────────────────────── -->
+<div class="status-bar">
+  <span class="status-dot" id="wsDot"></span>
+  <span id="wsStatus"></span>
+  <div class="level-meter" id="levelMeter" aria-label="Audio level">
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+    <div class="level-bar" style="height:3px"></div>
+  </div>
+  <div class="rec-indicator" id="recIndicator"><span class="rec-dot"></span>REC</div>
+  <span class="perf-stat" id="perfStat"></span>
+  <button class="asr-pill local" id="asrPill" aria-label="ASR engine" title="ASR engine — click to change">
+    <span class="asr-dot"></span><span id="asrLabel">Local model</span>
+  </button>
+  <span style="margin-left:auto; font-size:11px;" id="timer"></span>
+</div>
+
+<!-- ─── Error banner ──────────────────────────────────── -->
+<div class="error-banner" id="errorBanner" role="alert">
+  <span id="errorMsg"></span>
+  <button id="errorRetry">Retry</button>
+  <span class="dismiss" id="errorDismiss">✕</span>
+</div>
+
+<!-- ─── Main content ──────────────────────────────────── -->
+<div class="main">
+  <div class="controls">
+    <button class="mic-btn" id="micBtn" aria-label="Toggle microphone">
+      ▶ Start Mic
+    </button>
+    <button id="resetBtn" aria-label="Reset identification">↺ Reset</button>
+  </div>
+
+  <div class="display">
+    <div class="shabad-name">
+      <span id="shabadName">Press Start Mic to begin</span>
+    </div>
+    <div class="line-main" id="lineMain">—</div>
+    <div class="line-tl" id="lineTl"></div>
+    <div class="line-tr" id="lineTr"></div>
+    <div class="waveform" id="waveform"><canvas id="waveCanvas"></canvas></div>
+    <div class="listen-state" id="listenState"><span class="dot"></span><span id="listenMsg">Listening…</span></div>
+  </div>
+
+  <!-- Full shabad lines (shown when tracking) -->
+  <div class="shabad-lines" id="shabadLines" aria-label="Shabad lines">
+    <h3>All Lines</h3>
+    <div id="linesList"></div>
+  </div>
+
+  <div class="candidates" id="candidatesPanel">
+    <!-- 2px progress bar at top of panel: fills over 5s, snaps back on every
+         engine event. Subtle "system is working" indicator between updates. -->
+    <div class="panel-tick-bar"><span id="tickProgress"></span></div>
+    <h3 style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Candidates <span style="font-weight:400;color:var(--muted);font-size:11px">(hover to pause)</span></span>
+    </h3>
+    <ul class="cand-list" id="candList" role="listbox" aria-label="Shabad candidates">
+      <li class="cand-search" data-action="search" tabindex="0" role="option">
+        <div style="flex:1">🔍 Search manually and move on to tracking</div>
+      </li>
+      <li style="color:var(--muted)">Start mic to identify shabads</li>
+    </ul>
+  </div>
+
+  <!-- STTM -->
+  <div class="sttm-bar">
+    <label>STTM</label>
+    <input id="sttmCode" type="text" placeholder="code" maxlength="7" aria-label="STTM sync code">
+    <input id="sttmPin" type="number" placeholder="PIN" aria-label="STTM PIN">
+    <button id="sttmBtn">Connect</button>
+    <span class="sttm-status" id="sttmStatus">disconnected</span>
+    <span class="sttm-help" id="sttmHelp" style="cursor:pointer">how?</span>
+    <div id="sttmHelpText" style="display:none; width:100%; font-size:12px; color:var(--muted); margin-top:6px; line-height:1.5;">
+      1. Open <b>SikhiToTheMax Desktop</b><br>
+      2. Click <b>Bani Controller</b> (remote icon)<br>
+      3. Copy the <b>Code</b> and <b>PIN</b> shown there<br>
+      4. Paste them above and click Connect
+    </div>
+  </div>
+</div>
+
+<!-- ─── Settings overlay ──────────────────────────────── -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings">
+    <h2>Settings <span class="close" id="settingsClose">✕</span></h2>
+    <div class="setting-group">
+      <label>Gurmukhi Font Size <span class="val" id="fontSizeVal">32px</span></label>
+      <input type="range" id="fontSizeSlider" min="20" max="56" value="32">
+    </div>
+    <div class="setting-group">
+      <label>Audio Input</label>
+      <select id="audioDevice"></select>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <span>Record Session</span><br>
+        <span class="desc">Save audio + events locally for export</span>
+      </div>
+      <input type="checkbox" id="recordToggle">
+    </div>
+    <button id="exportSession" style="width:100%;margin-bottom:12px;font-size:13px;padding:8px">⬇ Export Recorded Sessions</button>
+    <div class="setting-group">
+      <label>Telemetry</label>
+      <select id="telemetryLevel">
+        <option value="off">Off — no analytics sent</option>
+        <option value="basic" selected>Basic — anonymous session stats</option>
+        <option value="detailed">Detailed — includes ASR text + all events</option>
+      </select>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <span>Show Translations</span><br>
+        <span class="desc">Show English translation below Gurmukhi</span>
+      </div>
+      <input type="checkbox" id="showTranslations" checked>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <span>Show ASR Text</span><br>
+        <span class="desc">Show raw Gurmukhi transcription</span>
+      </div>
+      <input type="checkbox" id="showAsr" checked>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <span>Developer View</span><br>
+        <span class="desc">Show event log and performance stats</span>
+      </div>
+      <input type="checkbox" id="devModeToggle">
+    </div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+    <div class="setting-group">
+      <label>ASR Engine</label>
+      <select id="asrEngineSelect"
+              style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;">
+        <option value="local">Local model — free, on-device</option>
+        <option value="google">Google Chirp 2 — cloud, paid</option>
+      </select>
+      <div id="asrGoogleConfig" style="display:none; margin-top:10px;">
+        <!-- Connected: show identity + Disconnect -->
+        <div id="gcpConnectedBlock" style="display:none">
+          <div style="padding:8px 10px;background:rgba(96,165,250,0.08);border-radius:6px;border:1px solid rgba(96,165,250,0.2);font-size:12px;line-height:1.5;">
+            <div style="color:var(--accent);font-weight:600;margin-bottom:2px;">Connected ✓</div>
+            <div style="color:var(--muted);">Service account: <code id="gcpEmail" style="font-size:11px;color:var(--text);"></code></div>
+            <div style="color:var(--muted);">Project: <code id="gcpProjectIdDisplay" style="font-size:11px;color:var(--text);"></code></div>
+          </div>
+          <button id="gcpDisconnectBtn"
+                  style="width:100%;margin-top:6px;font-size:12px;padding:5px;background:transparent;color:var(--err);border:1px solid var(--border);">
+            Disconnect &amp; remove key
+          </button>
+        </div>
+        <!-- Not connected: prompt to upload -->
+        <div id="gcpNotConnectedBlock">
+          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;line-height:1.5;">
+            Upload a service account JSON key from your GCP project to enable Google Chirp 2.
+            See the <a href="https://github.com/karanbirsingh/kirtan-captioning/blob/main/GOOGLE_CHIRP_SETUP.md" target="_blank" style="color:var(--accent);">setup guide</a>
+            for which IAM role to grant (Cloud Speech Client) and where to download the key.
+          </p>
+          <input type="file" id="gcpKeyFile" accept="application/json,.json" style="display:none">
+          <button id="gcpKeyPickBtn"
+                  style="width:100%;font-size:13px;padding:6px;background:var(--accent);color:white;border-color:var(--accent);">
+            Choose key file…
+          </button>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;">
+          Mic auto-stops after 1 hour while Google Chirp is active (~$3/hr at our cadence).
+          The key file is stored locally under your app-data folder, not transmitted to us.
+        </p>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:4px;">
+          <input type="checkbox" id="suppressAsrAutoStopDialog"> Don't show auto-stop dialog
+        </label>
+      </div>
+      <p id="gcpStatus" style="font-size:11px;color:var(--muted);margin-top:8px"></p>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+    <!-- ─── Advanced: tracking thresholds ───────────────────────── -->
+    <details class="setting-group" id="trackAdvanced">
+      <summary style="cursor:pointer;font-size:13px;color:var(--muted);user-select:none">
+        Advanced — tracking thresholds
+      </summary>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 12px;line-height:1.5">
+        Per-session overrides for the line-tracking knobs. Useful for tuning
+        line-flicker (raise <code>hysteresis</code>) or context length (raise
+        <code>window</code>). Bounds are enforced server-side.
+      </p>
+      <p id="trkCostWarning" style="display:none;font-size:11px;color:#f59e0b;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);padding:6px 8px;border-radius:4px;margin:0 0 12px;line-height:1.5">
+        ⚠ Google Chirp is active. Changing these knobs will affect cost. The local model has no such concern.
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 80px;gap:6px 10px;align-items:center;font-size:12px">
+        <label for="trkWindow">Tracking window (s)
+          <span style="color:var(--muted);font-size:11px"> — audio context per tick (3–60)</span>
+        </label>
+        <input type="number" id="trkWindow" min="3" max="60" step="1"
+               style="padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);font-size:13px;width:100%">
+        <label for="trkStep">Tracking step (s)
+          <span style="color:var(--muted);font-size:11px"> — interval between ticks (1–10)</span>
+        </label>
+        <input type="number" id="trkStep" min="1" max="10" step="0.5"
+               style="padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);font-size:13px;width:100%">
+        <label for="trkHyst">Hysteresis margin
+          <span style="color:var(--muted);font-size:11px"> — line-switch resistance (0–30)</span>
+        </label>
+        <input type="number" id="trkHyst" min="0" max="30" step="1"
+               style="padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);font-size:13px;width:100%">
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button id="trkApply" style="flex:1;font-size:12px;padding:5px">Apply</button>
+        <button id="trkReset" style="flex:1;font-size:12px;padding:5px;background:transparent;color:var(--muted);border:1px solid var(--border)">
+          Reset to defaults
+        </button>
+      </div>
+      <p id="trkStatus" style="font-size:11px;color:var(--muted);margin-top:8px"></p>
+    </details>
+    <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+    <div class="setting-group">
+      <label>Debug: record mic audio</label>
+      <button id="recordBtn" style="width:100%;font-size:13px;padding:6px;background:#c33;color:#fff">● Start Recording</button>
+      <p id="recordStatus" style="font-size:11px;color:var(--muted);margin-top:6px"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Search modal ────────────────────────────────────── -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-modal">
+    <h2>Search Shabad <span class="close" id="searchClose">✕</span></h2>
+    <input class="search-input" id="searchInput" type="text" autocomplete="off"
+           autocapitalize="off" spellcheck="false" placeholder="Type to search…">
+    <p class="search-hint">
+      Type first letter of each word, e.g. <code>ssam</code>
+    </p>
+    <div class="search-status" id="searchStatus"></div>
+    <div id="searchResults"></div>
+  </div>
+</div>
+
+<!-- ─── Onboarding overlay ────────────────────────────── -->
+<div class="onboard-overlay" id="onboardOverlay">
+  <div class="onboard">
+    <p>This is not a fully working app. It is a prototype to gather feedback &amp; share ideas. For example, it struggles with faster Kirtan. Please forgive any mistakes.</p>
+    <p style="font-size:13px;color:var(--text);margin:0 0 10px;text-align:left">How to improve results:</p>
+    <ul style="text-align:left;margin:0 0 14px;padding-left:20px;color:var(--text);font-size:14px;line-height:1.6">
+      <li>Plug sound system output directly into computer, or move computer closer to speaker</li>
+      <li>Try a different speech-to-text model. The local model runs on your computer for free, but is small. The Google model is paid but has better accuracy</li>
+      <li>See the code yourself <a href="https://github.com/karanbirsingh/kirtan-captioning" target="_blank" style="color:var(--accent)">here</a> and take anything useful</li>
+    </ul>
+    <p style="font-size:13px;color:var(--text);margin:0 0 24px;text-align:left">Please do not leave fully unattended in Sangat (you can override the shabad &amp; line manually by stopping mic) 🙏</p>
+    <button id="onboardDismiss">Get Started</button>
+  </div>
+</div>
+
+<!-- ─── Dev panel ─────────────────────────────────────────── -->
+<div class="dev-panel collapsed" id="devPanel">
+  <div class="dev-bar" id="devBar">
+    <span class="tag">dev</span>
+    <span id="devBarStatus"></span>
+    <span style="margin-left:auto;opacity:0.5" id="devSessionId"></span>
+    <span class="arrow" id="devArrow">▲</span>
+  </div>
+  <div class="dev-header">
+    <span>Event Log</span>
+    <div class="perf">
+      <span>ASR: <span class="v" id="devAsr">—</span></span>
+      <span>Phase: <span class="v" id="devPhase">identifying</span></span>
+      <span>Events: <span class="v" id="devCount">0</span></span>
+    </div>
+  </div>
+  <div class="dev-log" id="devLog"></div>
+</div>
+
+<script>
+const APP_VERSION = "0.2.0";
+// Bump in lockstep with engine/wire.py PROTOCOL_VERSION. The `connected`
+// event echoes the server's; we warn (don't fail) on mismatch so older
+// clients still kind of work on newer servers and vice-versa.
+const CLIENT_PROTOCOL_VERSION = 1;
+
+// ─── State ───────────────────────────────────────────────────────────────
+let ws = null, audioCtx = null, workletNode = null, mediaStream = null;
+let running = false;
+let lockedShabadId = null, lockedLineCount = 0, currentLineIdx = -1;
+let allLines = [];  // lines of locked shabad [{text, translation, verse_id, index}]
+let sessionStart = null;
+let sessionShabadsLocked = 0, sessionErrors = 0, sessionManualLocks = 0;
+
+// ─── Client identity (per-page-load; drives server-side session reuse) ───
+// One UUID generated fresh on every page load, kept only in this JS
+// heap — NOT persisted to localStorage / sessionStorage. Sent as
+// ?cid=... on every WebSocket connect within this page's lifetime.
+//
+// The lifetime of this variable is exactly what we want for "same
+// session":
+//   - Stop Mic → Start Mic: same JS context, same cid → server reattach
+//   - Auto-reconnect after WS drop: same JS context, same cid → reattach
+//   - Page reload / new tab / app open: fresh JS heap, fresh cid →
+//     server has no prior session for this cid → starts in identifying.
+//     Treating a fresh page as a fresh session matches the user's mental
+//     model that "opening the app starts over".
+//
+// Server-side orphan sessions from prior page loads sit harmlessly in
+// the pool until the sidecar process exits (desktop) or a TTL evictor
+// is added (not yet — see Engine.sessions_by_client_id docstring).
+const CLIENT_ID = (crypto.randomUUID
+  ? crypto.randomUUID()
+  : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2));
+// Clean up the legacy localStorage key from the previous architecture.
+try { localStorage.removeItem("bani_client_id"); } catch {}
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+// ─── Settings (persisted to localStorage) ────────────────────────────────
+const DEFAULTS = { gurmukhiSize: 32, showTranslations: true, showAsr: true, recording: false, telemetry: 'basic', devMode: false, suppressAsrAutoStopDialog: false };
+let settings = { ...DEFAULTS };
+try {
+  const saved = JSON.parse(localStorage.getItem("bani_settings") || "{}");
+  settings = { ...DEFAULTS, ...saved };
+} catch {}
+
+function saveSetting(key, val) {
+  settings[key] = val;
+  try { localStorage.setItem("bani_settings", JSON.stringify(settings)); } catch {}
+}
+
+function applySettings() {
+  document.documentElement.style.setProperty("--gurmukhi-size", settings.gurmukhiSize + "px");
+  $("#fontSizeSlider").value = settings.gurmukhiSize;
+  $("#fontSizeVal").textContent = settings.gurmukhiSize + "px";
+  $("#showTranslations").checked = settings.showTranslations;
+  $("#showAsr").checked = settings.showAsr;
+  $("#recordToggle").checked = settings.recording;
+  $("#asr") && ($("#asr").style.display = settings.showAsr ? "" : "none");
+  $$("#lineTr, .shabad-line .lt").forEach(el => el.style.display = settings.showTranslations ? "" : "none");
+  if (settings.recording) { $("#recIndicator").classList.add("on"); }
+  else { $("#recIndicator").classList.remove("on"); }
+  $("#telemetryLevel").value = settings.telemetry;
+  // PostHog opt-in/out based on telemetry level
+  if (settings.telemetry === 'off') {
+    try { posthog.opt_out_capturing(); } catch {}
+  } else {
+    try { posthog.opt_in_capturing(); } catch {}
+  }
+  // Dev mode
+  $("#devModeToggle").checked = settings.devMode;
+  const dp = $("#devPanel");
+  if (settings.devMode) {
+    dp.classList.remove("collapsed"); dp.classList.add("expanded");
+    document.body.classList.add("dev-open");
+    $("#devArrow").textContent = "\u25BC";
+  } else {
+    dp.classList.remove("expanded"); dp.classList.add("collapsed");
+    document.body.classList.remove("dev-open");
+    $("#devArrow").textContent = "\u25B2";
+  }
+}
+
+// ─── Session Recording ──────────────────────────────────────────────────
+// Opt-in: records audio (as webm) + all server events to IndexedDB.
+// Can be exported later for algorithmic analysis / dataset building.
+let mediaRecorder = null, recordedChunks = [], recordedEvents = [];
+
+function startRecording(stream) {
+  if (!settings.recording || !stream) return;
+  try {
+    recordedChunks = [];
+    recordedEvents = [];
+    mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
+    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.start(1000); // chunk every 1s
+    console.log("[rec] started");
+  } catch (e) { console.warn("[rec] MediaRecorder failed:", e); }
+}
+
+function stopRecording() {
+  if (!mediaRecorder || mediaRecorder.state === "inactive") return;
+  return new Promise(resolve => {
+    mediaRecorder.onstop = async () => {
+      const audioBlob = new Blob(recordedChunks, { type: "audio/webm" });
+      const session = {
+        id: crypto.randomUUID(),
+        date: new Date().toISOString(),
+        duration: sessionStart ? (Date.now() - sessionStart) / 1000 : 0,
+        events: recordedEvents,
+        audioSize: audioBlob.size,
+      };
+      // Store in IndexedDB
+      try {
+        const db = await openRecDB();
+        const tx = db.transaction("sessions", "readwrite");
+        tx.objectStore("sessions").put({ ...session, audio: audioBlob });
+        await tx.complete;
+        console.log(`[rec] saved session ${session.id} (${recordedEvents.length} events, ${(audioBlob.size/1024).toFixed(0)}KB audio)`);
+      } catch (e) { console.warn("[rec] save failed:", e); }
+      mediaRecorder = null;
+      recordedChunks = [];
+      recordedEvents = [];
+      resolve();
+    };
+    mediaRecorder.stop();
+  });
+}
+
+function openRecDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open("bani_sessions", 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("sessions", { keyPath: "id" });
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function recordEvent(ev) {
+  if (settings.recording && recordedEvents) {
+    recordedEvents.push({ ts: Date.now(), ...ev });
+  }
+  // Always log to session events (for feedback export)
+  sessionEvents.push({ ts: Date.now(), ...ev });
+  if (sessionEvents.length > 5000) sessionEvents.shift(); // cap memory
+}
+
+function recordAction(action, detail) {
+  if (settings.recording && recordedEvents) {
+    recordedEvents.push({ ts: Date.now(), type: "user_action", action, ...detail });
+  }
+  sessionEvents.push({ ts: Date.now(), type: "user_action", action, ...(detail || {}) });
+  if (sessionEvents.length > 5000) sessionEvents.shift();
+}
+
+// ─── Audio Level Meter ───────────────────────────────────────────────────
+const levelBars = [];
+let analyser = null;
+const LEVEL_BINS = 10;
+
+function initLevelMeter() {
+  const bars = $$("#levelMeter .level-bar");
+  bars.forEach(b => levelBars.push(b));
+}
+
+function updateLevel() {
+  if (!analyser || !running) {
+    levelBars.forEach(b => { b.style.height = "3px"; b.className = "level-bar"; });
+    return;
+  }
+  const data = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(data);
+  let sum = 0;
+  for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+  const rms = Math.sqrt(sum / data.length);
+  const level = Math.min(1, rms * 8); // scale to 0-1
+  const active = Math.round(level * LEVEL_BINS);
+  const isLow = rms < 0.008;
+  for (let i = 0; i < LEVEL_BINS; i++) {
+    const h = 3 + (i < active ? (i + 1) * 1.3 : 0);
+    levelBars[i].style.height = h + "px";
+    levelBars[i].className = i < active ? (isLow ? "level-bar low" : (i >= 8 ? "level-bar hot" : "level-bar active")) : "level-bar";
+  }
+  if (running) requestAnimationFrame(updateLevel);
+}
+
+// ─── Waveform visualization ─────────────────────────────────────────────
+let waveCanvas = null, waveCtx = null;
+let lastRms = 0, silenceCount = 0;
+
+function drawWaveform() {
+  if (!analyser || !running) {
+    $("#waveform").classList.remove("show");
+    $("#listenState").classList.remove("show");
+    return;
+  }
+  if (!waveCanvas) {
+    waveCanvas = $("#waveCanvas");
+    waveCtx = waveCanvas.getContext("2d");
+  }
+
+  // Match canvas resolution to display size every frame
+  const rect = waveCanvas.parentElement.getBoundingClientRect();
+  const w = Math.floor(rect.width * (window.devicePixelRatio || 1));
+  const h = Math.floor(rect.height * (window.devicePixelRatio || 1));
+  if (waveCanvas.width !== w || waveCanvas.height !== h) {
+    waveCanvas.width = w;
+    waveCanvas.height = h;
+  }
+  const dw = rect.width;
+  const dh = rect.height;
+
+  const bufLen = analyser.frequencyBinCount;
+  const data = new Float32Array(bufLen);
+  analyser.getFloatTimeDomainData(data);
+
+  // Clear
+  waveCtx.clearRect(0, 0, w, h);
+
+  // Draw waveform across full width
+  waveCtx.beginPath();
+  waveCtx.strokeStyle = "rgba(96, 165, 250, 0.7)";
+  waveCtx.lineWidth = 1.5 * (window.devicePixelRatio || 1);
+  const sliceWidth = w / bufLen;
+  for (let i = 0; i < bufLen; i++) {
+    const v = data[i];
+    const y = (0.5 + v * 3) * h;  // amplify for visibility
+    if (i === 0) waveCtx.moveTo(0, y);
+    else waveCtx.lineTo(i * sliceWidth, y);
+  }
+  waveCtx.stroke();
+
+  // Fill underneath for volume feel
+  waveCtx.lineTo(w, h * 0.5);
+  waveCtx.lineTo(0, h * 0.5);
+  waveCtx.fillStyle = "rgba(96, 165, 250, 0.06)";
+  waveCtx.fill();
+
+  // Noise gate threshold line (server rejects below 0.005 peak)
+  const gateY1 = (0.5 + 0.005 * 3) * h;
+  const gateY2 = (0.5 - 0.005 * 3) * h;
+  waveCtx.strokeStyle = "rgba(248, 113, 113, 0.25)";
+  waveCtx.lineWidth = 1;
+  waveCtx.setLineDash([4, 4]);
+  waveCtx.beginPath();
+  waveCtx.moveTo(0, gateY1); waveCtx.lineTo(w, gateY1);
+  waveCtx.moveTo(0, gateY2); waveCtx.lineTo(w, gateY2);
+  waveCtx.stroke();
+  waveCtx.setLineDash([]);
+
+  // RMS for state feedback (smoothed to prevent thrashing)
+  let sum = 0;
+  for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+  const rms = Math.sqrt(sum / data.length);
+  lastRms = lastRms * 0.9 + rms * 0.1;  // exponential moving average
+
+  // State feedback — only show on initial connect, not during active listening
+  // Volume info is shown via the level meter bars in the status bar
+  if (running) requestAnimationFrame(drawWaveform);
+}
+
+// ─── Timer ───────────────────────────────────────────────────────────────
+function updateTimer() {
+  if (!sessionStart || !running) { $("#timer").textContent = ""; return; }
+  const s = Math.floor((Date.now() - sessionStart) / 1000);
+  const m = Math.floor(s / 60);
+  $("#timer").textContent = `${m}:${String(s % 60).padStart(2, "0")}`;
+  if (running) setTimeout(updateTimer, 1000);
+}
+
+// ─── Error Handling ──────────────────────────────────────────────────────
+function showError(msg, retryFn) {
+  $("#errorMsg").textContent = msg;
+  $("#errorBanner").classList.add("show");
+  $("#errorRetry").onclick = () => { hideError(); if (retryFn) retryFn(); };
+}
+function hideError() { $("#errorBanner").classList.remove("show"); }
+$("#errorDismiss").onclick = hideError;
+
+// ─── WebSocket ───────────────────────────────────────────────────────────
+let wsRetries = 0;
+
+function setWsStatus(state) {
+  const dot = $("#wsDot"), label = $("#wsStatus");
+  dot.className = "status-dot " + (state === "live" ? "live" : state === "error" ? "error" :
+                                   state === "reconnecting" ? "reconnecting" : "");
+  label.textContent = state === "live" ? "connected" : state === "reconnecting" ?
+    `reconnecting (${wsRetries})…` : state === "error" ? "error" : "offline";
+}
+
+function connect() {
+  // ?cid=<uuid> is how the server matches us to a prior session in its
+  // pool (engine/__init__.py Engine.sessions_by_client_id). Without this
+  // the server constructs a fresh session in identifying phase on every
+  // new WebSocket, which is what previously caused Stop/Start mic (and
+  // any auto-reconnect) to silently lose the locked shabad. The cid is
+  // generated once and persisted in localStorage, so the same app instance
+  // always reattaches to its own server-side state — even across page
+  // reload and app restart.
+  const url = `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/ws?cid=${encodeURIComponent(CLIENT_ID)}`;
+  // Capture this socket in a local. Below we use it to filter out stale
+  // event callbacks: when a /ws supersede happens server-side (a newer
+  // connect() with the same cid), the *old* socket's onclose fires here
+  // *after* we've already reassigned the global `ws` to the newer
+  // socket. Without `myWs !== ws` guards, that stale onclose would
+  // null the global and trigger an auto-reconnect — a self-perpetuating
+  // loop because each reconnect supersedes again. Seen in the wild on
+  // 2026-05-23 sidecar.log (Reattached / Connection closed every 2s).
+  const myWs = new WebSocket(url);
+  myWs.binaryType = "arraybuffer";
+  // If we're replacing a previous socket from this same client (e.g.
+  // startMic after a stopMic that didn't tear down its WS), close it
+  // now so it stops sitting on the server doing nothing — the
+  // server-side handler will only exit its `async for msg in ws` once
+  // the socket actually closes. The stale-callback guard below makes
+  // sure this close doesn't trip our own reconnect logic.
+  if (ws && ws !== myWs && ws.readyState <= 1) {
+    try { ws.close(1000, "replaced by newer connect"); } catch {}
+  }
+  ws = myWs;
+
+  myWs.onopen = () => {
+    if (ws !== myWs) return;  // stale: a newer connect() has taken over
+    setWsStatus("live");
+    wsRetries = 0;
+    hideError();
+    // Note: we deliberately do NOT auto-activate Google Chirp on a
+    // fresh page load even if a project_id is in localStorage — that's
+    // a paid backend and "open the app" should always start in the
+    // safe (Local) state. The server-side session pool preserves the
+    // backend choice across stop/start mic and auto-reconnect within
+    // the same page lifetime, so we don't need to re-send anything
+    // here on routine reconnects either.
+  };
+
+  myWs.onmessage = (e) => {
+    if (ws !== myWs) return;  // stale: ignore messages from a superseded socket
+    if (typeof e.data !== "string") return;
+    const ev = JSON.parse(e.data);
+    recordEvent(ev);
+    handleEvent(ev);
+  };
+
+  myWs.onclose = (e) => {
+    // Stale-callback guard. When the server supersedes us via the
+    // reattach path (newer /ws connect with same cid), it closes our
+    // socket with code=1000 "superseded". The global `ws` was already
+    // reassigned to the newer socket, so this close is not actionable
+    // — auto-reconnecting here would just trigger ANOTHER reattach,
+    // closing the still-live new socket, ad infinitum.
+    if (ws !== myWs) return;
+    ws = null;
+    if (running) {
+      wsRetries++;
+      setWsStatus("reconnecting");
+      ph('ws_reconnect', { attempt: wsRetries });
+      // Re-check `running` inside the callback too: if the user clicks
+      // Stop Mic between scheduling this timeout and it firing, we'd
+      // otherwise open a zombie WebSocket against the now-dead session.
+      setTimeout(() => { if (running) connect(); }, Math.min(2000 * wsRetries, 10000));
+    } else {
+      setWsStatus("offline");
+    }
+  };
+
+  myWs.onerror = () => {
+    if (ws !== myWs) return;  // stale
+    setWsStatus("error");
+  };
+}
+
+// ─── Telemetry helpers ───────────────────────────────────────────────────
+function ph(event, props) {
+  if (settings.telemetry === 'off') return;
+  try { posthog.capture(event, props); } catch {}
+}
+function phDetailed(event, props) {
+  if (settings.telemetry !== 'detailed') return;
+  try { posthog.capture(event, props); } catch {}
+}
+
+// ─── Event Handler ───────────────────────────────────────────────────────
+let devEventCount = 0;
+let serverSessionId = null;
+let sessionEvents = [];  // always-on event log for feedback export
+
+// ─── File logger (Tauri-only) ─────────────────────────────────────────────
+// Routes high-frequency telemetry (AGC, per-event lines) to the on-disk log
+// at ~/Library/Logs/dev.gurbani.captioning/Gurbani Captioning.log via the
+// tauri-plugin-log invoke API. Avoids two real problems with console.log
+// in long sessions:
+//   1. WebKit's console silently caps at a few thousand entries with the
+//      "N messages are not shown" warning, hiding the data when you need it.
+//   2. Devtools may throttle the WebView's WS read loop if it gets behind on
+//      console output, causing apparent engine stalls.
+// Falls back to console.log when running outside Tauri (e.g. the hosted web
+// build at bani.karanbirsingh.com).
+const _tauriInvoke = window.__TAURI_INTERNALS__?.invoke;
+function logToFile(level, message) {
+  if (_tauriInvoke) {
+    _tauriInvoke("plugin:log|log", { level, message }).catch(() => {});
+  } else {
+    console.log(`[${level}] ${message}`);
+  }
+}
+
+// Animates the thin "next tick" progress bar inside #candidatesPanel.
+// On each engine event we snap to 100% (transition disabled), force a layout
+// commit, then drain down to 0% over TICK_MS. The shrinking bar reads as
+// "time left until next refresh" — more intuitive than fill-from-empty.
+const TICK_MS = 5000;
+function restartTickProgress() {
+  const el = document.getElementById("tickProgress");
+  if (!el) return;
+  el.style.transition = "none";
+  el.style.width = "100%";
+  // Force reflow so the browser commits the 100% before we re-enable transition.
+  void el.offsetWidth;
+  el.style.transition = `width ${TICK_MS}ms linear`;
+  el.style.width = "0%";
+}
+
+function handleEvent(ev) {
+  devEventCount++;
+  devLogEvent(ev);
+  console.log(`[event] ${ev.type}`, ev.phase || "", ev.current_line ?? "", ev.reason || "");
+  logToFile(2, `event ${ev.type} phase=${ev.phase || ""} line=${ev.current_line ?? ""} reason=${ev.reason || ""}`);
+
+  // Restart the "next tick" progress bar on every engine event. Interval matches
+  // the engine's identification_interval (5s; see engine/config.py). In tracking
+  // phase it's effectively 2s but we keep the visual length at 5s since the user
+  // doesn't care about the exact cadence, only that the system is working.
+  if (ev.type === "candidates" || ev.type === "status" || ev.type === "line_update") {
+    restartTickProgress();
+  }
+
+  // Surface performance stats
+  if (ev.asr_ms != null) {
+    $("#perfStat").innerHTML = `ASR <span class="val">${ev.asr_ms}ms</span>`;
+    $("#devAsr").textContent = ev.asr_ms + "ms";
+  }
+  if (ev.phase) $("#devPhase").textContent = ev.phase;
+  $("#devCount").textContent = devEventCount;
+
+  switch (ev.type) {
+    case "connected":
+      serverSessionId = ev.session_id;
+      console.log("[ws] session:", ev.session_id, "proto:", ev.protocol_version);
+      // Protocol-version sanity check. We pin the client expectation in
+      // CLIENT_PROTOCOL_VERSION; if the engine bumps and we don't, warn
+      // visibly so silent breakage doesn't slip through.
+      if (ev.protocol_version != null && ev.protocol_version !== CLIENT_PROTOCOL_VERSION) {
+        const msg = `Protocol version mismatch: client=${CLIENT_PROTOCOL_VERSION}, server=${ev.protocol_version}. Some features may behave unexpectedly. If you just upgraded the app, reload the page; if not, please report a bug.`;
+        console.warn("[ws]", msg);
+        logToFile(4, msg);
+      }
+      $("#shabadName").textContent = "Listening…";
+      $("#lineMain").textContent = "";
+      $("#listenMsg").textContent = "Connected — waiting for first analysis…";
+      $("#devBarStatus").textContent = `session: ${ev.session_id}`;
+      $("#devSessionId").textContent = ev.session_id;
+      recordAction("session_start", { session_id: ev.session_id });
+      // Push any saved Advanced tracking overrides up to the new session.
+      // Safe to call even when nothing is saved (it's a no-op then).
+      if (typeof maybeReapplyTrackingOverrides === "function") maybeReapplyTrackingOverrides();
+      if (typeof maybeReapplyShowAllCandidates === "function") maybeReapplyShowAllCandidates();
+      break;
+
+    case "tracking_overrides":
+      // Server echoes back the effective triple after our set_tracking_overrides
+      // command, post-clamping. Use it as the source of truth in the UI.
+      if (ev.effective && $("#trkStatus")) {
+        const e = ev.effective;
+        $("#trkStatus").textContent =
+          `Active: window=${e.tracking_window}s, step=${e.tracking_step}s, hysteresis=${e.hysteresis_margin}`;
+        $("#trkStatus").style.color = "var(--accent)";
+      }
+      break;
+
+    case "candidates":
+      $("#listenState").classList.remove("show");
+      if (candFrozen) {
+        pendingCands = ev.candidates || [];
+      } else {
+        renderCandidates(ev.candidates || []);
+      }
+      if (ev.candidates?.length) {
+        const top = ev.candidates[0];
+        $("#shabadName").textContent = "Identifying…";
+        $("#lineMain").textContent = "";
+      }
+      ph('candidates', {
+        count: (ev.candidates || []).length,
+        top_shabad_id: ev.candidates?.[0]?.shabad_id || null,
+        top_score: ev.candidates?.[0]?.score || null,
+        asr_ms: ev.asr_ms || null,
+        ...(settings.telemetry === 'detailed' ? { raw_asr: ev.raw_asr || null } : {}),
+      });
+      break;
+
+    case "locked":
+      lockedShabadId = ev.shabad_id;
+      lockedLineCount = ev.total_lines || 0;
+      // For a fresh lock, the server doesn't include current_line and
+      // tracking starts at line 1. For a resume snapshot (ev.resumed,
+      // emitted on WS reattach in tracking phase) the server tells us
+      // exactly which line the session is on so the UI doesn't jump
+      // back to the top before the next tracking tick corrects it.
+      currentLineIdx = ev.current_line || 1;  // 1-indexed
+      allLines = (ev.lines || []).map((l, i) => ({
+        index: l.index ?? (i + 1), text: l.text || "",
+        translation: l.translation || "", transliteration: l.transliteration || "",
+        verse_id: l.verse_id || null,
+      }));
+      $("#phase").className = "phase tracking";
+      $("#phase").textContent = "tracking";
+      $("#shabadName").textContent = ev.shabad_name || `Shabad ${ev.shabad_id}`;
+      // Show the current line's text + translation + transliteration
+      // (matches currentLineIdx so a resume lands on the right line).
+      const curLineOnLock = allLines.find(l => l.index === currentLineIdx)
+                          || (allLines.length ? allLines[0] : null);
+      $("#lineMain").textContent = curLineOnLock?.text || "—";
+      if (curLineOnLock?.transliteration) { $("#lineTl").textContent = curLineOnLock.transliteration; $("#lineTl").style.display = ""; }
+      if (curLineOnLock?.translation && settings.showTranslations) { $("#lineTr").textContent = curLineOnLock.translation; $("#lineTr").style.display = ""; }
+      // Hide candidates + waveform, show shabad lines
+      $("#candidatesPanel").style.display = "none";
+      $("#waveform").classList.remove("show");
+      renderShabadLines();
+      highlightCurrentLine();
+      // Fetch translations from BaniDB (non-blocking)
+      fetchTranslations(ev.shabad_id);
+      if (ev.verse_id) sttmPush(ev.shabad_id, ev.verse_id, ev.first_line || "");
+      // Telemetry: only count a NEW lock, not a resume.
+      if (!ev.resumed) {
+        sessionShabadsLocked++;
+        ph('shabad_locked', {
+          shabad_id: ev.shabad_id,
+          time_to_lock_s: sessionStart ? Math.round((Date.now() - sessionStart) / 1000) : 0,
+          total_lines: ev.total_lines || 0,
+          asr_ms: ev.asr_ms || null,
+        });
+      } else {
+        ph('shabad_resumed', { shabad_id: ev.shabad_id, line: currentLineIdx });
+      }
+      break;
+
+    case "line_update":
+      currentLineIdx = ev.current_line ?? currentLineIdx;
+      const lineText = ev.line_text || ev.display_text || "";
+      if (lineText) $("#lineMain").textContent = lineText;
+      // Look up translation + transliteration from allLines (enriched by BaniDB)
+      const updLine = allLines.find(l => l.index === currentLineIdx);
+      if (updLine?.transliteration) { $("#lineTl").textContent = updLine.transliteration; $("#lineTl").style.display = ""; }
+      else { $("#lineTl").textContent = ""; }
+      if (updLine?.translation && settings.showTranslations) { $("#lineTr").textContent = updLine.translation; $("#lineTr").style.display = ""; }
+      else { $("#lineTr").textContent = ""; }
+      highlightCurrentLine();
+      if (ev.verse_id && lockedShabadId) sttmPush(lockedShabadId, ev.verse_id, lineText);
+      ph('line_update', {
+        shabad_id: lockedShabadId,
+        line: ev.current_line,
+        asr_ms: ev.asr_ms || null,
+        ...(settings.telemetry === 'detailed' ? { raw_asr: ev.raw_asr || null } : {}),
+      });
+      break;
+
+    case "status":
+      // During tracking, update line highlight and show translation from allLines
+      if (ev.phase === "tracking" && ev.current_line != null) {
+        currentLineIdx = ev.current_line;
+        highlightCurrentLine();
+        const curLine = allLines.find(l => l.index === ev.current_line);
+        if (curLine) {
+          if (curLine.text) $("#lineMain").textContent = curLine.text;
+          if (curLine.transliteration) { $("#lineTl").textContent = curLine.transliteration; $("#lineTl").style.display = ""; }
+          if (curLine.translation && settings.showTranslations) { $("#lineTr").textContent = curLine.translation; $("#lineTr").style.display = ""; }
+        }
+      }
+      // Surface server state messages
+      if (ev.reason === "silence") {
+        $("#listenMsg").textContent = "No audio detected — check mic input";
+        $("#listenState").className = "listen-state show warn";
+        $("#shabadName").textContent = "Waiting for audio…";
+      } else if (ev.reason === "instrumental") {
+        $("#listenMsg").textContent = "Not hearing vocals — waiting for singing…";
+        $("#listenState").className = "listen-state show";
+        $("#shabadName").textContent = "Listening…";
+      } else if (ev.reason === "too_short") {
+        $("#listenMsg").textContent = "Audio too quiet — try moving mic closer";
+        $("#listenState").className = "listen-state show warn";
+      } else if (ev.phase === "identifying" && !ev.reason) {
+        $("#listenMsg").textContent = "Analyzing…";
+        $("#listenState").className = "listen-state show";
+      }
+      if (ev.phase === "identifying" && lockedShabadId) {
+        ph('phase_change', { from: 'tracking', to: 'identifying', reason: ev.reason || 'unknown' });
+        resetUI();
+      }
+      break;
+  }
+}
+
+// ─── Full Shabad Lines View ──────────────────────────────────────────────
+function renderShabadLines() {
+  if (!allLines.length) { $("#shabadLines").classList.remove("show"); return; }
+  const container = $("#linesList");
+  container.innerHTML = allLines.map((l) => `
+    <div class="shabad-line${l.index === currentLineIdx ? " current" : ""}" data-idx="${l.index}">
+      <span class="ln">${l.index}</span>
+      <span class="txt">${l.text}</span>
+      <span class="lt">${l.translation}</span>
+    </div>
+  `).join("");
+  $("#shabadLines").classList.add("show");
+  // Click to jump to line
+  container.querySelectorAll(".shabad-line").forEach(el => {
+    el.style.cursor = "pointer";
+    el.onclick = () => {
+      const idx = parseInt(el.dataset.idx);
+      currentLineIdx = idx;
+      // Tell server so hysteresis works from this line
+      if (ws?.readyState === 1) ws.send(JSON.stringify({ command: "jump", line: idx }));
+      recordAction("jump_line", { line: idx });
+      // Update main display with clicked line's text
+      const line = allLines.find(l => l.index === idx);
+      if (line) {
+        $("#lineMain").textContent = line.text;
+        if (line.transliteration) { $("#lineTl").textContent = line.transliteration; $("#lineTl").style.display = ""; }
+        if (line.translation && settings.showTranslations) { $("#lineTr").textContent = line.translation; $("#lineTr").style.display = ""; }
+        // Push to STTM
+        if (line.verse_id && lockedShabadId) sttmPush(lockedShabadId, line.verse_id, line.text);
+      }
+      highlightCurrentLine();
+    };
+  });
+  highlightCurrentLine();
+}
+
+function highlightCurrentLine() {
+  $$("#linesList .shabad-line").forEach((el) => {
+    el.classList.toggle("current", parseInt(el.dataset.idx) === currentLineIdx);
+  });
+  // Scroll current into view
+  const cur = $(".shabad-line.current");
+  if (cur) cur.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+// ─── Candidates ──────────────────────────────────────────────────────────
+let candFrozen = false;  // true while mouse hovers over candidate panel
+let pendingCands = null; // stashed candidates to render when unfrozen
+
+// ─── Transliteration cache ───────────────────────────────────────────────
+const tlCache = new Map(); // shabad_id -> {verses: [{tl, tr}]}
+
+async function fetchTlForShabad(shabadId) {
+  if (tlCache.has(shabadId)) return tlCache.get(shabadId);
+  try {
+    const r = await fetch(`https://api.banidb.com/v2/shabads/${shabadId}`);
+    const data = await r.json();
+    const verses = (data?.verses || []).map(v => ({
+      tl: v?.transliteration?.en || v?.transliteration?.english || "",
+      tr: v?.translation?.en?.bdb || v?.translation?.en?.ms || "",
+      text: v?.verse?.unicode || "",
+    }));
+    tlCache.set(shabadId, verses);
+    return verses;
+  } catch { return null; }
+}
+
+function renderCandidates(cands) {
+  const ul = $("#candList");
+  // Always-present "search manually" row at the top. Acts like a
+  // candidate but opens the search overlay instead of locking.
+  const searchRow = `<li class="cand-search" data-action="search" tabindex="0" role="option">
+    <div style="flex:1">🔍 Search manually and move on to tracking</div>
+  </li>`;
+  if (!cands.length) {
+    ul.innerHTML = searchRow +
+      '<li style="color:var(--muted)">Listening for kirtan…</li>';
+    return;
+  }
+  ul.innerHTML = searchRow + cands.map((c) => {
+    const displayText = c.matched_line_text || c.name || 'Shabad ' + c.shabad_id;
+    const tl = c.matched_line_transliteration || "";
+    return `
+    <li data-sid="${c.shabad_id}" tabindex="0" role="option">
+      <div style="flex:1">
+        <div>${displayText}</div>
+        ${tl ? `<div style="font-size:12px;color:var(--muted);opacity:0.7">${tl}</div>` : ""}
+      </div>
+      <button class="confirm-btn" data-sid="${c.shabad_id}">Confirm</button>
+    </li>`;
+  }).join("");
+  ul.querySelectorAll("li[data-sid]").forEach(li => {
+    const lockFn = () => {
+      const sid = parseInt(li.dataset.sid);
+      if (li.classList.contains("locking")) return;  // prevent double-fire
+      // Optimistic UI: the engine takes ~500ms-2s to process a lock command
+      // (it has to run an ASR pass on the tracking window before emitting
+      // `locked`). Without immediate feedback the user thinks the first click
+      // didn't register and clicks again. Mark the row visually so they know
+      // it took, then settle when the real `locked` event arrives.
+      li.classList.add("locking");
+      const btn = li.querySelector(".confirm-btn");
+      if (btn) btn.textContent = "Locking…";
+      if (ws?.readyState === 1) ws.send(JSON.stringify({ command: "lock", shabad_id: sid }));
+      sessionManualLocks++;
+      recordAction("confirm_candidate", { shabad_id: sid });
+    };
+    li.onclick = lockFn;
+  });
+}
+
+// Freeze candidate updates AND the tick bar while hovering, so users can
+// read/click without anything moving. On enter we snap the bar's width to
+// its computed value (cancels the in-flight transition); on leave we resume
+// the drain from wherever it was over the remaining time proportion.
+$("#candidatesPanel").addEventListener("mouseenter", () => {
+  candFrozen = true;
+  const el = document.getElementById("tickProgress");
+  if (el) {
+    const w = getComputedStyle(el).width;
+    el.style.transition = "none";
+    el.style.width = w;
+  }
+});
+$("#candidatesPanel").addEventListener("mouseleave", () => {
+  candFrozen = false;
+  if (pendingCands) { renderCandidates(pendingCands); pendingCands = null; }
+  // Resume the drain from current position to 0% over the remaining time.
+  const el = document.getElementById("tickProgress");
+  if (el) {
+    const pct = parseFloat(getComputedStyle(el).width) / el.parentElement.clientWidth || 0;
+    void el.offsetWidth;
+    el.style.transition = `width ${Math.round(TICK_MS * pct)}ms linear`;
+    el.style.width = "0%";
+  }
+});
+
+// ─── Mic Capture ─────────────────────────────────────────────────────────
+// Set up the audio capture chain: AudioContext + AGC worklet + mediaStream.
+// Extracted from startMic so recycleAudio can reuse it without touching the WS.
+async function setupAudioChain() {
+    audioCtx = new AudioContext({ sampleRate: 16000 });
+
+    // Combined AGC + PCM worklet: dynamically adjusts gain to keep RMS
+    // near a target level (mimics Chrome's proprietary AGC which Electron/
+    // Edge/WKWebView lack). Also forwards PCM samples to the main thread.
+    await audioCtx.audioWorklet.addModule(URL.createObjectURL(new Blob([`
+        class AGCProcessor extends AudioWorkletProcessor {
+          constructor() {
+            super();
+            this.gain = 1.0;        // start at unity — kirtan often starts loud, no headroom for 3-30× transients
+            this.targetRms = 0.08;  // target RMS level
+            this.minGain = 1.0;
+            this.maxGain = 8.0;     // hard cap — 30× was clipping every loud peak (CTC sees flat-line, returns <unk>)
+            this.attackRate = 0.6;    // very fast attack — clamp overload within ~20ms (2-3 blocks)
+            this.releaseRate = 0.03;  // gentle release — settle in ~1s once input shows up
+            this.framesSinceStart = 0;
+          }
+          process(inputs) {
+            const ch = inputs[0]?.[0];
+            if (!ch || ch.length === 0) return true;
+
+            // Compute RMS of input
+            let sum = 0;
+            for (let i = 0; i < ch.length; i++) sum += ch[i] * ch[i];
+            const rms = Math.sqrt(sum / ch.length);
+
+            // Adjust gain toward target RMS — much lower silence floor so we adapt
+            // even on quiet input (macOS mic ramps from near-zero RMS over ~20s).
+            if (rms > 0.00001) {
+              const desired = this.targetRms / rms;
+              const clamped = Math.max(this.minGain, Math.min(this.maxGain, desired));
+              // Smooth: attack fast (reduce gain to prevent clipping),
+              // release slow but not too slow (increase gain on quiet input).
+              // Boost release further during the first ~2s so warmup is sub-second.
+              const warming = this.framesSinceStart < 250; // ~2s at 128-sample blocks @ 16kHz
+              if (clamped < this.gain) {
+                this.gain += (clamped - this.gain) * this.attackRate;
+              } else {
+                const rate = warming ? this.releaseRate * 5 : this.releaseRate;
+                this.gain += (clamped - this.gain) * rate;
+              }
+            }
+            this.framesSinceStart++;          // Apply gain and clip
+          const out = new Float32Array(ch.length);
+          let outMax = 0;
+          for (let i = 0; i < ch.length; i++) {
+            out[i] = Math.max(-1, Math.min(1, ch[i] * this.gain));
+            const a = Math.abs(out[i]);
+            if (a > outMax) outMax = a;
+          }
+          // Telemetry every ~500ms: raw mic RMS, current gain, output peak.
+          // Lets us distinguish "macOS mic is still silent" from "we're clipping".
+          if ((this.framesSinceStart & 63) === 0) {
+            this.port.postMessage({ kind: "agc", rms, gain: this.gain, outMax, frame: this.framesSinceStart });
+          }
+          this.port.postMessage(out);
+          return true;
+        }
+      }
+      registerProcessor("agc", AGCProcessor);
+    `], { type: "application/javascript" })));
+
+    const constraints = { audio: { channelCount: 1, sampleRate: 16000,
+                           echoCancellation: false, noiseSuppression: false, autoGainControl: false } };
+    const deviceId = $("#audioDevice").value;
+    if (deviceId) constraints.audio.deviceId = { exact: deviceId };
+
+    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+    const source = audioCtx.createMediaStreamSource(mediaStream);
+
+    // Level meter analyser (connected to raw source for accurate level display)
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    source.connect(analyser);
+
+    // AGC worklet: dynamic gain + PCM forwarding
+    workletNode = new AudioWorkletNode(audioCtx, "agc");
+    workletNode.port.onmessage = (e) => {
+      const d = e.data;
+      // Telemetry packets are plain objects with kind:"agc". PCM is a Float32Array.
+      if (d && d.kind === "agc") {
+        console.log(`[agc] t=${(d.frame * 128 / 16000).toFixed(2)}s rms=${d.rms.toExponential(2)} gain=${d.gain.toFixed(2)} outMax=${d.outMax.toFixed(3)}`);
+        logToFile(2, `agc t=${(d.frame * 128 / 16000).toFixed(2)}s rms=${d.rms.toExponential(2)} gain=${d.gain.toFixed(2)} outMax=${d.outMax.toFixed(3)}`);
+        return;
+      }
+      // Capture for debug recording (Float32Array is sent here)
+      if (recording) {
+        recordBuffer.push(new Float32Array(d));
+      }
+      if (ws?.readyState === 1) ws.send(d.buffer);
+    };
+    source.connect(workletNode);
+}
+
+async function startMic() {
+  if (running) { stopMic(); return; }
+  hideError();
+
+  try {
+    await setupAudioChain();
+
+    // Recording
+    startRecording(mediaStream);
+
+    connect();
+    running = true;
+    // Recycle the audio chain every 15 min to prevent long-session degradation
+    // (WKWebView AudioContext drift seen on macOS after ~30-60 min). Engine-side
+    // session is keyed by client_id, so the locked shabad + line state survive.
+    if (audioRecycleTimer) clearInterval(audioRecycleTimer);
+    audioRecycleTimer = setInterval(recycleAudio, 15 * 60 * 1000);
+    sessionStart = Date.now();
+    sessionShabadsLocked = 0; sessionErrors = 0; sessionManualLocks = 0;
+    sessionEvents = [];  // fresh session
+    serverSessionId = null;
+    posthog.capture('session_start', {
+      os: navigator.platform,
+      cores: navigator.hardwareConcurrency || 0,
+      screen: `${screen.width}x${screen.height}`,
+      telemetry_level: settings.telemetry,
+    });
+    $("#micBtn").classList.add("active");
+    $("#micBtn").innerHTML = '■ Stop Mic';
+    $("#phase").style.display = "";
+    $("#shabadName").textContent = "Connecting…";
+    $("#lineMain").textContent = "";
+    $("#waveform").classList.add("show");
+    $("#listenState").classList.add("show");
+    $("#listenMsg").textContent = "Starting…";
+    silenceCount = 0;
+    updateLevel();
+    drawWaveform();
+    updateTimer();
+
+  } catch (err) {
+    console.error("[mic] error:", err);
+    sessionErrors++;
+    ph('error', { error_type: err.name, message: err.message, context: 'mic_start' });
+    if (err.name === "NotAllowedError") {
+      showError("Microphone permission denied. Please allow mic access in your browser/system settings.", startMic);
+    } else if (err.name === "NotFoundError") {
+      showError("No microphone found. Please connect a microphone and try again.", startMic);
+    } else {
+      showError(`Mic error: ${err.message}`, startMic);
+    }
+  }
+}
+
+async function stopMic() {
+  running = false;
+  if (audioRecycleTimer) { clearInterval(audioRecycleTimer); audioRecycleTimer = null; }
+  // Cancel any pending Google-ASR auto-stop timer too — it'd otherwise fire
+  // up to GOOGLE_AUTO_STOP_MS later against a dead session, sending a
+  // confusing toast / WS message into the void.
+  if (asrAutoStopTimer) { clearTimeout(asrAutoStopTimer); asrAutoStopTimer = null; }
+  if (sessionStart) {
+    ph('session_end', {
+      duration_s: Math.round((Date.now() - sessionStart) / 1000),
+      shabads_locked: sessionShabadsLocked,
+      manual_locks: sessionManualLocks,
+      errors: sessionErrors,
+    });
+  }
+  // Tear down audio capture.
+  if (workletNode) { workletNode.disconnect(); workletNode = null; }
+  if (analyser) { analyser = null; }
+  if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  await stopRecording();
+  // Close the WebSocket. With server-side session continuity (the
+  // engine keeps a per-client_id session pool — see Engine.sessions_by_client_id),
+  // the locked shabad and line position survive a closed WS. The next
+  // Start Mic opens a fresh socket with the same `?cid=...` and the
+  // server reattaches to the same session in the same phase. Keeping
+  // the socket open on Stop only leaves a zombie until the idle
+  // watchdog reaps it ~1hr later, with no upside.
+  if (ws) {
+    try { ws.close(1000, "stop mic"); } catch {}
+    ws = null;  // onclose is gated by `running=false` above so no auto-reconnect
+  }
+  setWsStatus("");
+  $("#wsDot").className = "status-dot";
+  $("#micBtn").classList.remove("active");
+  $("#micBtn").innerHTML = '▶ Start Mic';
+  $("#phase").style.display = "none";
+  $("#waveform").classList.remove("show");
+  $("#listenState").classList.remove("show");
+  $("#shabadName").textContent = "Press Start Mic to begin";
+  $("#lineMain").textContent = "—";
+  updateLevel();
+  sessionStart = null;
+  $("#timer").textContent = "";
+}
+
+// ─── AudioContext recycle ───────────────────────────────────────────────
+// Long WKWebView sessions (~30-60min) sometimes show audio degradation:
+// the worklet keeps reporting RMS but the engine-side ASR cadence stretches
+// from ~5s to ~30s+, and stopping/starting the mic instantly fixes it. The
+// cause is likely accumulated WebKit AudioContext state (buffers fragmenting,
+// MediaStreamSource leaks, scheduler drift). Recycling the audio chain on
+// a timer keeps things fresh without disrupting the WebSocket — the engine's
+// `sessions_by_client_id` pool preserves the locked shabad + line tracking
+// across the ~300ms audio gap, so the user sees zero state loss.
+let audioRecycleTimer = null;
+async function recycleAudio() {
+  if (!running) return;
+  console.log("[recycle] tearing down audio chain (ws + lock state preserved)");
+  logToFile(3, "audio recycle: tearing down chain");
+  if (workletNode) { workletNode.disconnect(); workletNode = null; }
+  analyser = null;
+  if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
+  if (audioCtx) { try { await audioCtx.close(); } catch {} audioCtx = null; }
+  await stopRecording();
+  try {
+    await setupAudioChain();
+    startRecording(mediaStream);
+    logToFile(3, "audio recycle: complete");
+  } catch (err) {
+    logToFile(5, `audio recycle failed: ${err.message}`);
+    showError(`Audio recycle failed: ${err.message}. Click Start Mic to retry.`, startMic);
+    running = false;
+  }
+}
+
+// ─── Controls & Keyboard Shortcuts ───────────────────────────────────────
+function resetUI() {
+  lockedShabadId = null; lockedLineCount = 0; currentLineIdx = -1; allLines = [];
+  $("#phase").className = "phase identifying";
+  $("#phase").textContent = "identifying";
+  $("#shabadName").textContent = "Identifying shabad…";
+  $("#lineMain").textContent = "—";
+  $("#lineTr").textContent = "";
+  $("#lineTl").textContent = "";
+  $("#shabadLines").classList.remove("show");
+  $("#linesList").innerHTML = "";
+  $("#candidatesPanel").style.display = "";
+  renderCandidates([]);
+  $("#waveform").classList.add("show");
+  $("#listenState").classList.add("show");
+  $("#listenMsg").textContent = "Listening…";
+}
+
+$("#micBtn").onclick = startMic;
+$("#resetBtn").onclick = () => {
+  if (ws?.readyState === 1) ws.send(JSON.stringify({ command: "reset" }));
+  recordAction("reset");
+  resetUI();
+};
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if (e.code === "Space") { e.preventDefault(); startMic(); }
+  if (e.key === "/") { e.preventDefault(); openSearch(); }
+  if (e.key === "Escape") {
+    if ($("#searchOverlay").classList.contains("show")) {
+      closeSearch();
+    } else if ($("#settingsOverlay").classList.contains("show")) {
+      $("#settingsOverlay").classList.remove("show");
+    } else if ($("#onboardOverlay").classList.contains("show")) {
+      $("#onboardOverlay").classList.remove("show");
+    } else if (ws?.readyState === 1) {
+      ws.send(JSON.stringify({ command: "reset" }));
+    }
+  }
+});
+
+// ─── Settings Panel ──────────────────────────────────────────────────────
+$("#settingsBtn").onclick = () => $("#settingsOverlay").classList.add("show");
+$("#settingsClose").onclick = () => $("#settingsOverlay").classList.remove("show");
+$("#settingsOverlay").onclick = (e) => { if (e.target === $("#settingsOverlay")) $("#settingsOverlay").classList.remove("show"); };
+
+$("#fontSizeSlider").oninput = (e) => {
+  saveSetting("gurmukhiSize", parseInt(e.target.value));
+  applySettings();
+};
+$("#showTranslations").onchange = (e) => { saveSetting("showTranslations", e.target.checked); applySettings(); };
+$("#showAsr").onchange = (e) => { saveSetting("showAsr", e.target.checked); applySettings(); };
+$("#recordToggle").onchange = (e) => { saveSetting("recording", e.target.checked); applySettings(); };
+$("#telemetryLevel").onchange = (e) => { saveSetting("telemetry", e.target.value); applySettings(); };
+$("#devModeToggle").onchange = (e) => { saveSetting("devMode", e.target.checked); applySettings(); };
+
+// ─── ASR engine selection ────────────────────────────────────────────────
+// In-memory per page load. Resets to "local" on refresh / app reopen
+// so a paid backend can never quietly persist across sessions. The
+// server-side session pool (Engine.sessions_by_client_id) preserves
+// the active backend across stop/start mic and WS reconnect within a
+// single page lifetime, so we don't have to replay it on every ws.
+// onopen — the server still remembers "this session is on Chirp 2".
+let asrMode = "local";
+
+// Cached snapshot of the server-side Google credential state. Refreshed
+// from /api/google/status on init and after upload/disconnect actions.
+// The server stores the service account key under its app-data dir
+// (engine/google_auth.py); the client just needs to know whether it's
+// connected and what to show in the UI.
+let googleAuthState = { connected: false, email: "", project_id: "" };
+
+// Auto-stop the mic after this many ms of Google Chirp being active.
+// Chirp 2 is ~$3/hr at our cadence; left on overnight is ~$30. This
+// is the single most important cost rail — forces the user to make a
+// fresh decision every hour. Resets when ASR switches back to local
+// or the mic is stopped manually.
+const GOOGLE_AUTO_STOP_MS = 60 * 60 * 1000;
+let asrAutoStopTimer = null;
+
+function sendGoogleConfig(projectId) {
+  if (ws?.readyState === 1) {
+    ws.send(JSON.stringify({ command: "set_google_asr", project_id: projectId }));
+  }
+}
+
+function setAsrMode(mode) {
+  if (mode === "google") {
+    if (!googleAuthState.connected) {
+      // No saved key. Don't fight the user's dropdown choice — leave it
+      // on "Google Chirp 2" so they see the upload prompt in context.
+      // asrMode stays as-is (typically "local"), so the header pill
+      // still accurately reflects what's running. Once they upload, the
+      // upload handler calls setAsrMode("google") again and we land in
+      // the activate branch below.
+      $("#asrGoogleConfig").style.display = "";
+      $("#gcpStatus").textContent = "Upload a service account key to activate Google Chirp.";
+      $("#gcpStatus").style.color = "var(--err)";
+      $("#gcpKeyPickBtn")?.focus();
+      return false;
+    }
+    sendGoogleConfig(googleAuthState.project_id);
+    asrMode = "google";
+    armGoogleAutoStop();
+    $("#gcpStatus").textContent = "Google Chirp 2 active — auto-stops in 1 hour.";
+    $("#gcpStatus").style.color = "var(--accent)";
+  } else {
+    sendGoogleConfig("");  // server reverts to local ONNX
+    asrMode = "local";
+    cancelGoogleAutoStop();
+    $("#gcpStatus").textContent = googleAuthState.connected
+      ? "Using local model. Switch above to use Google Chirp."
+      : "Using local model (free, on-device).";
+    $("#gcpStatus").style.color = "var(--muted)";
+  }
+  renderAsrPill();
+  ph('asr_change', { mode: asrMode });
+  return true;
+}
+
+function renderAsrPill() {
+  const pill = $("#asrPill");
+  const label = $("#asrLabel");
+  if (!pill || !label) return;
+  pill.classList.toggle("google", asrMode === "google");
+  pill.classList.toggle("local", asrMode !== "google");
+  label.textContent = asrMode === "google" ? "Google Chirp" : "Local model";
+  // Show the cost-implications note in the Advanced section only when
+  // Google is the active backend — raising tracking_window on Chirp
+  // proportionally raises the per-hour spend.
+  const costNote = $("#trkCostWarning");
+  if (costNote) costNote.style.display = (asrMode === "google") ? "" : "none";
+  // NOTE: we deliberately don't sync the dropdown here. The dropdown
+  // reflects the user's *intent* (e.g. "I'd like to use Google but
+  // haven't uploaded a key yet") which can legitimately diverge from
+  // `asrMode` (the actual backend). Callers that need to force-sync
+  // (auto-stop, disconnect) do it explicitly via syncAsrDropdown().
+}
+
+function syncAsrDropdown() {
+  // Force the dropdown to match the actual asrMode. Used when state
+  // changes happen outside a user action (auto-stop, disconnect,
+  // successful upload that auto-activates Google).
+  if ($("#asrEngineSelect")) $("#asrEngineSelect").value = asrMode;
+  if ($("#asrGoogleConfig")) $("#asrGoogleConfig").style.display = (asrMode === "google") ? "" : "none";
+}
+
+function renderGoogleAuthUi() {
+  if (!$("#gcpConnectedBlock")) return;
+  if (googleAuthState.connected) {
+    $("#gcpConnectedBlock").style.display = "";
+    $("#gcpNotConnectedBlock").style.display = "none";
+    $("#gcpEmail").textContent = googleAuthState.email || "(unknown)";
+    $("#gcpProjectIdDisplay").textContent = googleAuthState.project_id || "(unknown)";
+  } else {
+    $("#gcpConnectedBlock").style.display = "none";
+    $("#gcpNotConnectedBlock").style.display = "";
+  }
+}
+
+async function refreshGoogleAuthState() {
+  try {
+    const r = await fetch("/api/google/status");
+    if (r.ok) googleAuthState = await r.json();
+  } catch {
+    googleAuthState = { connected: false };
+  }
+  renderGoogleAuthUi();
+}
+
+async function uploadGoogleKey(fileText) {
+  // The server accepts either a JSON envelope or the raw key file body;
+  // we send the file contents as-is. Errors surface a human-readable
+  // message in the status line so users can spot a wrong-file-type
+  // mistake (e.g. they downloaded an OAuth client JSON instead).
+  let resp;
+  try {
+    resp = await fetch("/api/google/credentials", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: fileText,
+    });
+  } catch (e) {
+    $("#gcpStatus").textContent = `Upload failed: ${e.message}`;
+    $("#gcpStatus").style.color = "var(--err)";
+    return false;
+  }
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+    $("#gcpStatus").textContent = `Upload rejected: ${err.error || "unknown error"}`;
+    $("#gcpStatus").style.color = "var(--err)";
+    return false;
+  }
+  const data = await resp.json();
+  googleAuthState = { connected: true, email: data.email, project_id: data.project_id };
+  renderGoogleAuthUi();
+  $("#gcpStatus").textContent = `Connected as ${data.email}. Select Google Chirp 2 above to activate.`;
+  $("#gcpStatus").style.color = "var(--accent)";
+  ph('google_auth_connected', { email_domain: (data.email || "").split("@")[1] || "" });
+  return true;
+}
+
+async function disconnectGoogle() {
+  try { await fetch("/api/google/credentials", { method: "DELETE" }); } catch {}
+  googleAuthState = { connected: false, email: "", project_id: "" };
+  renderGoogleAuthUi();
+  // If we were live on Google, fall back to local. Otherwise just
+  // update copy.
+  if (asrMode === "google") {
+    setAsrMode("local");
+    syncAsrDropdown();
+  } else {
+    $("#gcpStatus").textContent = "Disconnected. Upload a new key to re-enable.";
+    $("#gcpStatus").style.color = "var(--muted)";
+  }
+  ph('google_auth_disconnected');
+}
+
+function armGoogleAutoStop() {
+  cancelGoogleAutoStop();
+  asrAutoStopTimer = setTimeout(triggerGoogleAutoStop, GOOGLE_AUTO_STOP_MS);
+}
+function cancelGoogleAutoStop() {
+  if (asrAutoStopTimer) { clearTimeout(asrAutoStopTimer); asrAutoStopTimer = null; }
+}
+function triggerGoogleAutoStop() {
+  asrAutoStopTimer = null;
+  const wasRunning = running;
+  ph('asr_auto_stop_fired', { mode: asrMode, was_running: wasRunning });
+  // The auto-stop is non-negotiable — only the dialog is suppressible.
+  // Switching back to local first prevents the next Start Mic from
+  // silently being on Google again.
+  setAsrMode("local");
+  syncAsrDropdown();  // user wasn't clicking; force the UI to match
+  if (wasRunning) stopMic();
+  // Only surface the dialog if the mic was actually running when the
+  // timer fired. If the user enabled Google but never started the mic
+  // (no cost was being accrued), silently switching back is enough —
+  // a popup would be confusing and feel like noise.
+  if (wasRunning && !settings.suppressAsrAutoStopDialog) {
+    alert(
+      "Mic stopped after 1 hour on Google Chirp.\n\n" +
+      "This is a cost-protection rail to prevent accidentally running a " +
+      "paid ASR overnight. Press Start Mic to continue — you'll need to " +
+      "re-enable Google Chirp from settings if you want to keep using it."
+    );
+  }
+}
+
+(async function initAsrUi() {
+  if ($("#suppressAsrAutoStopDialog")) {
+    $("#suppressAsrAutoStopDialog").checked = !!settings.suppressAsrAutoStopDialog;
+    $("#suppressAsrAutoStopDialog").onchange = (e) =>
+      saveSetting("suppressAsrAutoStopDialog", e.target.checked);
+  }
+  renderAsrPill();
+  await refreshGoogleAuthState();
+
+  $("#asrEngineSelect").onchange = (e) => {
+    // Reflect the user's choice in the config-block visibility first,
+    // so they see the upload prompt immediately when picking Google
+    // — even if we can't actually activate it yet (no creds saved).
+    if ($("#asrGoogleConfig")) {
+      $("#asrGoogleConfig").style.display = (e.target.value === "google") ? "" : "none";
+    }
+    setAsrMode(e.target.value);
+  };
+
+  // File-picker flow. The hidden <input type="file"> is clicked
+  // programmatically by the visible button so we can style the trigger.
+  // We read the file as text and POST it as the request body — the
+  // server validates structure before persisting.
+  $("#gcpKeyPickBtn")?.addEventListener("click", () => $("#gcpKeyFile").click());
+  $("#gcpKeyFile")?.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 32 * 1024) {
+      // Service account JSONs are ~2 KB. Anything materially larger is
+      // almost certainly the wrong file — fail fast instead of POSTing
+      // megabytes.
+      $("#gcpStatus").textContent = "File too large — service account keys are tiny (~2 KB).";
+      $("#gcpStatus").style.color = "var(--err)";
+      e.target.value = "";
+      return;
+    }
+    const text = await file.text();
+    e.target.value = "";  // allow re-picking same file
+    const ok = await uploadGoogleKey(text);
+    if (ok) {
+      setAsrMode("google");  // auto-activate after a successful upload
+      syncAsrDropdown();     // and make sure the dropdown reflects it
+    }
+  });
+
+  $("#gcpDisconnectBtn")?.addEventListener("click", disconnectGoogle);
+
+  // Header pill opens settings panel to the ASR section.
+  $("#asrPill").onclick = () => {
+    $("#settingsOverlay").classList.add("show");
+    setTimeout(() => $("#asrEngineSelect")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+  };
+})();
+
+// ─── Advanced: tracking thresholds ───────────────────────────────────────
+// Per-session overrides for tracking_window / tracking_step / hysteresis_margin.
+// Persisted in localStorage so they survive page reload + are re-applied to
+// any new server session via the WS `set_tracking_overrides` command.
+//
+// Empty input = "use server default" (no override). Server clamps any
+// out-of-bounds value, then echoes back the effective triple via a
+// `tracking_overrides` event — we display that as confirmation.
+const TRACK_OVERRIDES_KEY = "bani_tracking_overrides";
+
+function loadTrackingOverrides() {
+  try { return JSON.parse(localStorage.getItem(TRACK_OVERRIDES_KEY) || "{}"); }
+  catch { return {}; }
+}
+function saveTrackingOverrides(o) {
+  try { localStorage.setItem(TRACK_OVERRIDES_KEY, JSON.stringify(o)); } catch {}
+}
+function sendTrackingOverrides(o) {
+  if (ws?.readyState !== 1) return;
+  // Send all three keys explicitly so the server treats absent keys as
+  // "clear this override" — partial updates would be ambiguous.
+  ws.send(JSON.stringify({
+    command: "set_tracking_overrides",
+    tracking_window: o.tracking_window ?? null,
+    tracking_step: o.tracking_step ?? null,
+    hysteresis_margin: o.hysteresis_margin ?? null,
+  }));
+}
+
+(function initTrackingAdvanced() {
+  const saved = loadTrackingOverrides();
+  if ($("#trkWindow")) $("#trkWindow").value = saved.tracking_window ?? "";
+  if ($("#trkStep")) $("#trkStep").value = saved.tracking_step ?? "";
+  if ($("#trkHyst")) $("#trkHyst").value = saved.hysteresis_margin ?? "";
+  if ($("#trkWindow")) $("#trkWindow").placeholder = "15";
+  if ($("#trkStep")) $("#trkStep").placeholder = "2";
+  if ($("#trkHyst")) $("#trkHyst").placeholder = "7";
+
+  function readForm() {
+    const num = (id) => {
+      const v = $(id).value.trim();
+      if (v === "") return null;
+      const f = parseFloat(v);
+      return isFinite(f) ? f : null;
+    };
+    return {
+      tracking_window: num("#trkWindow"),
+      tracking_step: num("#trkStep"),
+      hysteresis_margin: num("#trkHyst"),
+    };
+  }
+
+  $("#trkApply")?.addEventListener("click", () => {
+    const o = readForm();
+    saveTrackingOverrides(o);
+    sendTrackingOverrides(o);
+    $("#trkStatus").textContent = "Applied. Waiting for server confirmation…";
+    $("#trkStatus").style.color = "var(--muted)";
+  });
+  $("#trkReset")?.addEventListener("click", () => {
+    if ($("#trkWindow")) $("#trkWindow").value = "";
+    if ($("#trkStep")) $("#trkStep").value = "";
+    if ($("#trkHyst")) $("#trkHyst").value = "";
+    saveTrackingOverrides({});
+    sendTrackingOverrides({});
+    $("#trkStatus").textContent = "Reverted to defaults.";
+    $("#trkStatus").style.color = "var(--muted)";
+  });
+})();
+
+// Re-apply saved overrides on each WS open (the session-side overrides
+// are per-WS so we need to push them up after every reconnect AND after
+// every cid-pool reattach). This sits *outside* the ws.onopen handler
+// because we don't want to touch its closure — instead we ride on the
+// `connected` event which fires immediately after onopen anyway.
+function maybeReapplyTrackingOverrides() {
+  const saved = loadTrackingOverrides();
+  if (saved && (saved.tracking_window || saved.tracking_step || saved.hysteresis_margin)) {
+    sendTrackingOverrides(saved);
+  }
+}
+
+// Show-all candidates toggle removed 2026-05-24: server-side stability
+// filter (candidate_seen_counts) was removed too, so the raw top-5 by
+// score is always shown. These stubs keep older code paths from erroring.
+function maybeReapplyShowAllCandidates() {}
+
+// ─── Debug: record mic audio to WAV ─────────────────────────
+let recording = false;
+let recordBuffer = [];
+const SR_RECORD = 16000;
+
+function buildWav(float32Chunks, sampleRate) {
+  // Flatten all chunks
+  let totalLen = 0;
+  for (const c of float32Chunks) totalLen += c.length;
+  const samples = new Int16Array(totalLen);
+  let offset = 0;
+  for (const c of float32Chunks) {
+    for (let i = 0; i < c.length; i++) {
+      const s = Math.max(-1, Math.min(1, c[i]));
+      samples[offset++] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+  }
+  // WAV header
+  const dataLen = samples.length * 2;
+  const buf = new ArrayBuffer(44 + dataLen);
+  const view = new DataView(buf);
+  const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+  writeStr(0, "RIFF");
+  view.setUint32(4, 36 + dataLen, true);
+  writeStr(8, "WAVE");
+  writeStr(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, "data");
+  view.setUint32(40, dataLen, true);
+  new Int16Array(buf, 44).set(samples);
+  return new Blob([buf], { type: "audio/wav" });
+}
+
+$("#recordBtn").onclick = () => {
+  if (!recording) {
+    recordBuffer = [];
+    recording = true;
+    $("#recordBtn").textContent = "■ Stop & Download";
+    $("#recordStatus").textContent = "Recording…";
+    $("#recordStatus").style.color = "var(--accent)";
+  } else {
+    recording = false;
+    const totalSamples = recordBuffer.reduce((n, c) => n + c.length, 0);
+    const seconds = totalSamples / SR_RECORD;
+    if (totalSamples === 0) {
+      $("#recordStatus").textContent = "No audio captured — is mic running?";
+      $("#recordStatus").style.color = "var(--muted)";
+      $("#recordBtn").textContent = "● Start Recording";
+      return;
+    }
+    const blob = buildWav(recordBuffer, SR_RECORD);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    a.download = `mic_recording_${ts}.wav`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    $("#recordStatus").textContent = `Saved ${seconds.toFixed(1)}s (${(blob.size / 1024).toFixed(0)} KB)`;
+    $("#recordStatus").style.color = "var(--muted)";
+    $("#recordBtn").textContent = "● Start Recording";
+    recordBuffer = [];
+  }
+};
+
+// Populate audio devices
+async function loadAudioDevices() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const sel = $("#audioDevice");
+    sel.innerHTML = '<option value="">Default</option>';
+    devices.filter(d => d.kind === "audioinput").forEach(d => {
+      sel.innerHTML += `<option value="${d.deviceId}">${d.label || "Mic " + d.deviceId.slice(0, 8)}</option>`;
+    });
+  } catch {}
+}
+loadAudioDevices();
+
+// ─── Export sessions ─────────────────────────────────────────────────────
+$("#exportSession").onclick = async () => {
+  try {
+    const db = await openRecDB();
+    const tx = db.transaction("sessions", "readonly");
+    const store = tx.objectStore("sessions");
+    const all = await new Promise((resolve, reject) => {
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    if (!all.length) { alert("No recorded sessions. Enable 'Record Session' in settings first."); return; }
+    // If single session with audio, export as combined file
+    // Multiple sessions: export events only
+    const latest = all[all.length - 1];
+    if (latest.audio && latest.audio.size > 0) {
+      // Create a simple combined download: events JSON + audio WebM
+      // (Not a real zip — just download both files)
+      const eventsBlob = new Blob([JSON.stringify({
+        id: latest.id, date: latest.date, duration: latest.duration,
+        server_session_id: serverSessionId,
+        events: latest.events, audioSize: latest.audioSize,
+      }, null, 2)], { type: "application/json" });
+      const dateStr = new Date().toISOString().slice(0,10);
+      // Download events
+      const a1 = document.createElement("a");
+      a1.href = URL.createObjectURL(eventsBlob);
+      a1.download = `session-${dateStr}-events.json`;
+      a1.click();
+      // Download audio
+      setTimeout(() => {
+        const a2 = document.createElement("a");
+        a2.href = URL.createObjectURL(latest.audio);
+        a2.download = `session-${dateStr}-audio.webm`;
+        a2.click();
+      }, 500);
+    } else {
+      // No audio — just export events
+      const exportData = all.map(s => ({
+        id: s.id, date: s.date, duration: s.duration,
+        events: s.events, audioSize: s.audioSize,
+      }));
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `bani-sessions-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+  } catch (e) { alert("Export failed: " + e.message); }
+};
+
+// ─── Feedback ────────────────────────────────────────────────────────────
+// Opens a Google Form in the system browser. The previous flow downloaded
+// a session-events JSON + audio recording and then opened a GitHub issue;
+// that was confusing for non-developer users ("what's this JSON file
+// for?"). For diagnostic data we still need from real reporters we'll
+// follow up via the form's email reply.
+const FEEDBACK_FORM_URL = "https://forms.gle/B6yq6Fyg7xLx8u3KA";
+$("#feedbackBtn").onclick = (e) => {
+  e.preventDefault();
+  ph('feedback_open');
+  openExternal(FEEDBACK_FORM_URL);
+};
+
+// ─── External link routing ──────────────────────────────────────────────
+// In a plain browser, `window.open(url, "_blank")` and `<a target="_blank">`
+// behave the way you'd expect — pop a new tab. In Tauri WebView2 they
+// either silently no-op (window.open) or navigate the current view to
+// the external URL (target=_blank), neither of which is what we want
+// for a "open this in the user's normal browser" link.
+//
+// Tauri ships a `shell.open` plugin that calls the OS default URL handler;
+// we route through that when running inside the desktop shell, and fall
+// back to plain window.open when the page is served standalone.
+//
+// We also intercept *every* anchor with target="_blank" via a single
+// document-level click listener so future external links don't have to
+// remember to call openExternal explicitly — they just stay as plain
+// <a target="_blank"> in the markup and Just Work.
+async function openExternal(url) {
+  try {
+    const invoke = window.__TAURI_INTERNALS__?.invoke;
+    if (typeof invoke === "function") {
+      await invoke("plugin:shell|open", { path: url });
+      return;
+    }
+  } catch (e) {
+    console.warn("[openExternal] Tauri shell.open failed, falling back:", e);
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+document.addEventListener("click", (e) => {
+  const a = e.target.closest && e.target.closest('a[target="_blank"]');
+  if (!a || !a.href) return;
+  // Only intercept absolute http/https links — leave fragment links,
+  // mailto:, custom protocols, etc. to the browser's native handling.
+  if (!/^https?:\/\//i.test(a.href)) return;
+  e.preventDefault();
+  openExternal(a.href);
+});
+
+// ─── Onboarding ──────────────────────────────────────────────────────────
+if (!localStorage.getItem("bani_onboarded")) {
+  $("#onboardOverlay").classList.add("show");
+}
+$("#onboardDismiss").onclick = () => {
+  $("#onboardOverlay").classList.remove("show");
+  localStorage.setItem("bani_onboarded", "1");
+};
+$("#helpBtn").onclick = () => $("#onboardOverlay").classList.add("show");
+
+// ─── Fetch translations from BaniDB ──────────────────────────────────────
+// Called after lock to enrich allLines with English translations.
+// Non-blocking — UI works without translations, they just appear when ready.
+function fetchTranslations(shabadId) {
+  // Use tlCache if available (already fetched during candidate phase)
+  const enrichFromVerses = (verses) => {
+    if (!verses?.length) return;
+    const norm = s => s.replace(/[॥।੦੧੨੩੪੫੬੭੮੯\s]/g, "");
+    for (const line of allLines) {
+      const target = norm(line.text).slice(0, 15);
+      if (!target) continue;
+      for (const v of verses) {
+        const vText = v.text || v?.verse?.unicode || "";
+        if (norm(vText).includes(target)) {
+          if (v.tr || v?.translation?.en) {
+            const tr = v.tr || v?.translation?.en;
+            line.translation = typeof tr === "string" ? tr : (tr?.bdb || tr?.ms || tr?.ssk || "");
+          }
+          if (v.tl || v?.transliteration?.en) {
+            line.transliteration = v.tl || v?.transliteration?.en || v?.transliteration?.english || "";
+          }
+          break;
+        }
+      }
+    }
+    // Show for current line
+    const cur = allLines.find(l => l.index === currentLineIdx);
+    if (cur?.transliteration) { $("#lineTl").textContent = cur.transliteration; $("#lineTl").style.display = ""; }
+    if (cur?.translation) { $("#lineTr").textContent = cur.translation; $("#lineTr").style.display = ""; }
+    console.log(`[translations] enriched ${allLines.filter(l=>l.translation).length}/${allLines.length} lines`);
+  };
+
+  // Try cache first
+  if (tlCache.has(shabadId)) {
+    enrichFromVerses(tlCache.get(shabadId));
+    return;
+  }
+  // Fetch from BaniDB
+  fetchTlForShabad(shabadId).then(verses => {
+    if (verses) enrichFromVerses(verses);
+  });
+}
+
+// ─── STTM Controller ────────────────────────────────────────────────────
+let sttmSocket = null, sttmPin = 0, sttmConnected = false;
+let lastPushedSid = null, lastPushedVid = null;
+
+function sttmSetStatus(msg, cls) {
+  const el = $("#sttmStatus");
+  el.textContent = msg;
+  el.className = "sttm-status " + (cls || "");
+}
+
+function sttmConnect(code, pin) {
+  if (sttmSocket) { sttmSocket.disconnect(); sttmSocket = null; }
+  sttmConnected = false;
+  sttmPin = parseInt(pin, 10) || 0;
+  if (!code || !sttmPin) { sttmSetStatus("need code + PIN", "err"); return; }
+  sttmSetStatus("connecting…");
+  lastPushedSid = null; lastPushedVid = null;
+  const ns = code.trim();
+
+  const loadAndConnect = () => {
+    sttmSocket = io(`https://api.sikhitothemax.org/${ns}`);
+    sttmSocket.on("connect", () => {
+      sttmSetStatus("authenticating…");
+      sttmSocket.emit("data", { host: "sttm-web", type: "request-control", pin: sttmPin });
+      setTimeout(() => { if (!sttmConnected) sttmSetStatus("no response (check code/PIN)", "err"); }, 5000);
+    });
+    sttmSocket.on("connect_error", () => sttmSetStatus("connection failed", "err"));
+    sttmSocket.on("data", (evt) => {
+      if (evt.host === "sttm-desktop" && evt.type !== "response-control") {
+        const echoSid = evt.shabadid ?? evt.shabadId ?? evt.id ?? null;
+        const echoVid = evt.highlight ?? evt.verseId ?? null;
+        if (echoSid === lastPushedSid && echoVid === lastPushedVid) return;
+        lastPushedSid = null; lastPushedVid = null;
+      }
+      if (evt.type === "response-control") {
+        if (evt.success) {
+          sttmConnected = true;
+          sttmSetStatus("connected ✓", "ok");
+          $("#sttmBtn").classList.add("connected");
+          try { localStorage.setItem("sttm_code", ns); localStorage.setItem("sttm_pin", String(sttmPin)); } catch {}
+        } else { sttmSetStatus("wrong PIN", "err"); }
+      }
+    });
+    sttmSocket.on("disconnect", () => { sttmConnected = false; sttmSetStatus("disconnected"); });
+  };
+
+  if (typeof io === "undefined") {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/socket.io-client@2.5.0/dist/socket.io.min.js";
+    s.onload = loadAndConnect;
+    s.onerror = () => sttmSetStatus("failed to load socket.io", "err");
+    document.head.appendChild(s);
+  } else { loadAndConnect(); }
+}
+
+function sttmPush(shabadId, verseId, gurmukhi) {
+  if (!sttmConnected || !sttmSocket) return;
+  if (shabadId === lastPushedSid && verseId === lastPushedVid) return;
+  lastPushedSid = shabadId; lastPushedVid = verseId;
+  sttmSocket.emit("data", {
+    host: "sttm-web", type: "shabad", pin: sttmPin,
+    shabadId, verseId, gurmukhi: gurmukhi || "", lineCount: lockedLineCount,
+  });
+}
+
+$("#sttmBtn").onclick = () => sttmConnect($("#sttmCode").value, $("#sttmPin").value);
+$("#sttmHelp").onclick = () => {
+  const el = $("#sttmHelpText");
+  el.style.display = el.style.display === "none" ? "block" : "none";
+};
+try {
+  const s = localStorage.getItem("sttm_code"), p = localStorage.getItem("sttm_pin");
+  if (s) $("#sttmCode").value = s;
+  if (p) $("#sttmPin").value = p;
+} catch {}
+
+// ─── Shabad Search (BaniDB API) ─────────────────────────────────────────
+// Searches api.banidb.com — same API that SikhiToTheMax uses.
+// Auto-detects input type: Gurmukhi unicode, romanized first-letters, etc.
+let searchDebounce = null, searchAbort = null, searchLastFetch = 0;
+
+function openSearch() {
+  $("#searchOverlay").classList.add("show");
+  setTimeout(() => { try { $("#searchInput").focus(); } catch {} }, 60);
+}
+function closeSearch() {
+  $("#searchOverlay").classList.remove("show");
+  if (searchAbort) { try { searchAbort.abort(); } catch {} searchAbort = null; }
+}
+
+$("#searchClose").onclick = closeSearch;
+// Delegated handler so the initial inline "search manually" row in the
+// candidates list works before renderCandidates() ever fires.
+$("#candList").addEventListener("click", (e) => {
+  const row = e.target.closest("li[data-action=search]");
+  if (row) openSearch();
+});
+$("#searchOverlay").onclick = (e) => { if (e.target === $("#searchOverlay")) closeSearch(); };
+
+function detectSearchMode(q) {
+  // Romanized first-letter search (searchtype=7) works best across all inputs
+  return { type: 7, gurmukhi: 0, label: "first letters" };
+}
+
+function escHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+$("#searchInput").addEventListener("input", () => {
+  const q = $("#searchInput").value.trim();
+  clearTimeout(searchDebounce);
+  if (!q || q.length < 2) {
+    $("#searchResults").innerHTML = "";
+    $("#searchStatus").textContent = q ? "Keep typing…" : "";
+    return;
+  }
+  searchDebounce = setTimeout(() => runBaniSearch(q), 300);
+});
+
+function runBaniSearch(q) {
+  const mode = detectSearchMode(q);
+  const url = `https://api.banidb.com/v2/search/${encodeURIComponent(q)}?searchtype=${mode.type}${mode.gurmukhi ? "&isGurmukhi=1" : ""}`;
+  if (searchAbort) { try { searchAbort.abort(); } catch {} }
+  searchAbort = new AbortController();
+  const thisFetch = ++searchLastFetch;
+  $("#searchStatus").textContent = `Searching… (${mode.label})`;
+  $("#searchStatus").className = "search-status";
+
+  fetch(url, { signal: searchAbort.signal })
+    .then(r => r.json())
+    .then(j => {
+      if (thisFetch !== searchLastFetch) return;
+      const verses = j?.verses || [];
+      // Dedupe by shabadId
+      const seen = new Set(), rows = [];
+      for (const v of verses) {
+        if (!v?.shabadId || seen.has(v.shabadId)) continue;
+        seen.add(v.shabadId);
+        rows.push(v);
+        if (rows.length >= 20) break;
+      }
+      if (!rows.length) {
+        $("#searchResults").innerHTML = "";
+        $("#searchStatus").textContent = "No results.";
+        return;
+      }
+      $("#searchStatus").textContent = `${rows.length} shabad${rows.length > 1 ? "s" : ""} · ${mode.label}`;
+      $("#searchResults").innerHTML = rows.map(v => {
+        const unicode = v.verse?.unicode || "";
+        const writer = v.writer?.english || "";
+        const src = v.source?.english || "";
+        const page = v.pageNo ? `ang ${v.pageNo}` : "";
+        const meta = [writer, src, page].filter(Boolean).join(" · ");
+        return `<button class="search-result" data-sid="${v.shabadId}">
+          <div class="gurm">${escHtml(unicode)}</div>
+          <div class="meta">${escHtml(meta)}</div>
+        </button>`;
+      }).join("");
+      // Click to lock
+      $("#searchResults").querySelectorAll(".search-result").forEach(btn => {
+        btn.onclick = () => {
+          const sid = parseInt(btn.dataset.sid);
+          if (ws?.readyState === 1) {
+            ws.send(JSON.stringify({ command: "lock", shabad_id: sid }));
+            ph('search_lock', { shabad_id: sid });
+            recordAction("search_lock", { shabad_id: sid });
+          }
+          closeSearch();
+        };
+      });
+    })
+    .catch(err => {
+      if (err?.name === "AbortError") return;
+      if (thisFetch !== searchLastFetch) return;
+      $("#searchStatus").textContent = "Search failed. Check connection.";
+      $("#searchStatus").className = "search-status error";
+    });
+}
+
+// ─── Dev Panel (Ctrl+D) ──────────────────────────────────────────────────
+function devLogEvent(ev) {
+  const log = $("#devLog");
+  if (!log) return;
+  const ts = sessionStart ? ((Date.now() - sessionStart) / 1000).toFixed(1) + "s" : "0.0s";
+  let detail = "";
+  switch (ev.type) {
+    case "candidates":
+      detail = `${(ev.candidates||[]).length} cands` +
+        (ev.candidates?.[0] ? ` | top: ${(ev.candidates[0].name||'').slice(0,30)} (${(ev.candidates[0].score||0).toFixed(0)})` : "") +
+        (ev.raw_asr ? ` | asr: "${ev.raw_asr.slice(0,40)}"` : "");
+      break;
+    case "locked":
+      detail = `shabad=${ev.shabad_id} "${ev.shabad_name}" lines=${ev.total_lines}`;
+      break;
+    case "line_update":
+      detail = `line=${ev.current_line} "${(ev.display_text||"").slice(0, 50)}"`;
+      if (ev.verse_id) detail += ` vid=${ev.verse_id}`;
+      break;
+    case "status":
+      detail = `phase=${ev.phase}`;
+      if (ev.raw_asr) detail += ` | asr: "${ev.raw_asr.slice(0, 50)}"`;
+      if (ev.asr_ms) detail += ` | ${ev.asr_ms}ms`;
+      break;
+    case "connected":
+      detail = `session=${ev.session_id}`;
+      break;
+    default:
+      detail = JSON.stringify(ev).slice(0, 120);
+  }
+  const div = document.createElement("div");
+  div.className = "ev";
+  div.innerHTML = `<span class="ev-ts">${ts}</span><span class="ev-type ${ev.type}">${ev.type}</span><span class="ev-detail">${detail}</span>`;
+  log.appendChild(div);
+  // Auto-scroll, keep max 200 entries
+  if (log.children.length > 200) log.removeChild(log.firstChild);
+  log.scrollTop = log.scrollHeight;
+}
+
+function toggleDevPanel() {
+  const dp = $("#devPanel");
+  const isExpanded = dp.classList.contains("expanded");
+  settings.devMode = !isExpanded;
+  saveSetting("devMode", settings.devMode);
+  applySettings();
+}
+
+$("#devBar").onclick = toggleDevPanel;
+
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.key === "d") {
+    e.preventDefault();
+    toggleDevPanel();
+  }
+});
+
+// Browser-style zoom (⌘+ / ⌘- / ⌘0) is handled natively by Tauri's
+// zoom_hotkeys_enabled(true) polyfill — see src-tauri/src/main.rs.
+
+// ─── Init ────────────────────────────────────────────────────────────────
+initLevelMeter();
+applySettings();
+
+// ─── Update check ────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const r = await fetch("https://api.github.com/repos/karanbirsingh/kirtan-captioning/releases/latest");
+    if (!r.ok) return;
+    const d = await r.json();
+    const latest = (d.tag_name || "").replace(/^v/, "");
+    if (latest && latest !== APP_VERSION) {
+      $("#updateVersion").textContent = "v" + latest;
+      $("#updateBanner").dataset.url = d.html_url;
+      $("#updateBanner").style.display = "";
+    }
+  } catch (_) { /* offline or rate-limited — silent */ }
+})();
+</script>
+</body>
+</html>

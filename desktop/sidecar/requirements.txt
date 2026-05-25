@@ -1,0 +1,49 @@
+# Desktop sidecar dependencies. Pinned loosely so PyInstaller picks
+# matched wheels per-platform; tighten once we have a CI matrix.
+#
+# Core HTTP server
+aiohttp>=3.9,<4
+
+# Native ONNX Runtime — the whole point of going desktop. CPU is the
+# universal target; DirectML provider lights up GPU acceleration on
+# Windows DX12 hardware (iGPUs included) for another ~3-5× speedup.
+# We pip-install the CPU build here for development; the Windows build
+# pipeline will swap in onnxruntime-directml. Keep both major versions
+# aligned with web/edge-worker.js (currently onnxruntime-web 1.20.x) so
+# we don't ship subtly different decoder behavior.
+onnxruntime>=1.20,<1.22 ; sys_platform != "win32"
+onnxruntime-directml>=1.20,<1.22 ; sys_platform == "win32"
+
+# Audio + tokenization, same versions as the prod requirements.txt
+numpy>=1.26,<3
+sentencepiece>=0.1.99,<0.3
+
+# rapidfuzz — used by ShabadMatcher.fuzzy_keyword_bidir for partial-ratio
+# scoring. Required by live_detection_server import chain.
+rapidfuzz>=3.0,<4
+
+# Google Cloud auth — service account JSON path for production customers
+# + ADC fallback for dev. Pulls in cryptography + rsa + pyasn1 (~10 MB
+# bundled) for RS256 JWT signing on token exchange. Listed as a hidden
+# import in sidecar.spec because google-auth uses late-bound transport
+# discovery that PyInstaller's static analysis misses.
+google-auth>=2.20,<3
+# repo-root requirements.txt). Comment out for the production sidecar
+# bundle to shave bytes.
+pytest>=7.0
+
+# Build-only — used by sidecar.spec to produce dist/bani-mic/. Not
+# linked into the bundle. Pin loosely; PyInstaller's runtime is the
+# bootloader, which is independent of this version. Note: incompatible
+# with the obsolete `pathlib` PyPI backport, so make sure no other dep
+# pulls it in (we hit that on a fresh clone 2026-05-05; remove with
+# `pip uninstall pathlib`).
+pyinstaller>=6.20,<7
+
+# Bootstrap-only — scripts/download_models.py uses huggingface_hub to
+# pull the 180 MB ONNX checkpoint + tokenizer from
+# karansea/indicconformer-stt-pa-ctc-shabad-preview on first build.
+# Listed in `excludes` inside sidecar.spec so it doesn't get bundled
+# into bani-mic.exe — at runtime the model is already on disk under
+# models/shabad-id-models/, so the sidecar never touches HF.
+huggingface_hub>=0.20,<1

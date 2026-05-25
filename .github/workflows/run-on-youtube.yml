@@ -1,0 +1,209 @@
+# Manual workflow: run the model on any YouTube clip.
+#
+# Goes from a YouTube URL → audio → live captioning → predictions JSON + log,
+# all in a free GitHub-hosted runner. No local setup required.
+#
+# Two modes:
+#   1. Discovery (default): no ground truth, just dump what the model
+#      predicted. Inspect via the JSON artifact + the inline server log.
+#   2. Scoring: paste a GT JSON URL (e.g. someone's gist or a benchmark
+#      case). The workflow scores predictions vs that GT.
+#
+# Triggered from the Actions tab → "Run on YouTube" → "Run workflow".
+# Takes 5-10 min depending on clip length + ASR cold-start (~3s on Ubuntu).
+
+name: Run on YouTube
+
+on:
+  workflow_dispatch:
+    inputs:
+      youtube_url:
+        description: "YouTube URL of the kirtan clip"
+        required: true
+        type: string
+      max_seconds:
+        description: "Max audio duration in seconds (defaults to 600 = 10 min). Longer = more CPU time."
+        required: false
+        default: "600"
+        type: string
+      gt_url:
+        description: "(Optional) URL to a ground-truth JSON in the benchmark schema. If provided, scores predictions against it."
+        required: false
+        default: ""
+        type: string
+      oracle_shabad_id:
+        description: "(Optional) Skip identification, force-lock onto this shabad_id. Useful when you know what's being sung."
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  run:
+    name: ASR + matcher on YouTube clip
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python + audio deps
+        # yt-dlp + ffmpeg do the YouTube → 16k mono WAV conversion.
+        # ffmpeg is preinstalled on ubuntu-latest; yt-dlp via pip.
+        run: |
+          pip install -r requirements.txt soundfile websockets yt-dlp
+
+      - name: Cache ONNX model
+        uses: actions/cache@v4
+        id: model-cache
+        with:
+          path: models/shabad-id-models
+          key: onnx-model-${{ hashFiles('scripts/download_models.py') }}
+
+      - name: Fetch model (if not cached)
+        if: steps.model-cache.outputs.cache-hit != 'true'
+        run: python scripts/download_models.py
+
+      - name: Download + convert YouTube audio
+        # yt-dlp grabs the best audio-only track (usually webm/Opus), then
+        # ffmpeg cuts the first --max_seconds and downsamples to 16k mono PCM.
+        # We use a derived stem `yt_<videoid>` for output naming so the
+        # benchmark_client + scorer treat it as a normal case.
+        run: |
+          mkdir -p /tmp/audio /tmp/pred
+          # Extract YouTube video ID for a clean stem (last 11 chars typically).
+          # Falls back to "yt_clip" if parsing fails — we just need *some* stem.
+          vid=$(echo "${{ inputs.youtube_url }}" | grep -oE "[a-zA-Z0-9_-]{11}" | tail -1 || echo "clip")
+          stem="yt_${vid}"
+          echo "STEM=$stem" >> "$GITHUB_ENV"
+          # Pull best audio-only stream; quiet output, retry on flake.
+          yt-dlp --quiet --no-warnings --retries 3 \
+                 -f bestaudio -o "/tmp/audio/${stem}.%(ext)s" \
+                 "${{ inputs.youtube_url }}"
+          src=$(ls /tmp/audio/${stem}.* | head -1)
+          echo "downloaded: $src"
+          # Transcode to 16k mono WAV, truncated to max_seconds.
+          ffmpeg -y -nostdin -loglevel error \
+                 -i "$src" \
+                 -t "${{ inputs.max_seconds }}" \
+                 -ar 16000 -ac 1 \
+                 "/tmp/audio/${stem}.wav"
+          dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "/tmp/audio/${stem}.wav")
+          echo "wav duration: ${dur}s"
+
+      - name: Synthesize a minimal GT JSON
+        # benchmark_client.py needs a GT file to know which audio to stream
+        # and (for oracle mode) which shabad to lock onto. For pure discovery
+        # runs we fabricate a one-segment GT spanning the full audio — the
+        # predictions will be valid JSON regardless of how badly they match.
+        # If the user provided a real GT URL, fetch that instead.
+        run: |
+          mkdir -p /tmp/gt
+          if [ -n "${{ inputs.gt_url }}" ]; then
+            echo "Fetching user-provided GT from ${{ inputs.gt_url }}"
+            curl -sL -o "/tmp/gt/${STEM}.json" "${{ inputs.gt_url }}"
+          else
+            dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "/tmp/audio/${STEM}.wav")
+            # Round to integer seconds (the scorer expects int durations).
+            dur_int=$(printf "%.0f" "$dur")
+            oracle="${{ inputs.oracle_shabad_id }}"
+            if [ -z "$oracle" ]; then oracle="null"; fi
+            cat > "/tmp/gt/${STEM}.json" <<EOF
+          {
+            "video_id": "${STEM}",
+            "shabad_id": ${oracle},
+            "total_duration": ${dur_int},
+            "uem": {"start": 0, "end": ${dur_int}},
+            "segments": [],
+            "lines": []
+          }
+          EOF
+          fi
+          cat "/tmp/gt/${STEM}.json"
+
+      - name: Start server (background)
+        # Burst mode for fast streaming + auto-lock unless oracle is set
+        # (oracle mode passes shabad_id from the benchmark client itself).
+        run: |
+          ALLOW_AUDIO_BURST=true python server.py > /tmp/srv.log 2>&1 &
+          for i in $(seq 1 30); do
+            grep -q "Engine ready" /tmp/srv.log 2>/dev/null && break
+            sleep 1
+          done
+          port=$(grep -oE "WebSocket: ws://[^ ]+" /tmp/srv.log | grep -oE "[0-9]+/ws" | grep -oE "^[0-9]+")
+          if [ -z "$port" ]; then
+            echo "FAIL: server didn't start"
+            cat /tmp/srv.log
+            exit 1
+          fi
+          echo "SERVER_PORT=$port" >> "$GITHUB_ENV"
+
+      - name: Stream audio through the model
+        run: |
+          ORACLE_FLAG=""
+          if [ -n "${{ inputs.oracle_shabad_id }}" ]; then
+            ORACLE_FLAG="--oracle"
+          fi
+          python benchmark/benchmark_client.py \
+            --api "ws://127.0.0.1:${SERVER_PORT}/ws" \
+            --gt /tmp/gt/ \
+            --audio-dir /tmp/audio/ \
+            --output /tmp/pred/ \
+            --no-realtime \
+            $ORACLE_FLAG
+
+      - name: Score (if GT was provided)
+        # In discovery mode the synthesized GT has no segments → scoring would
+        # be a zero. Only run the scorer if the GT had real segments OR a real
+        # GT was fetched from a URL.
+        if: ${{ inputs.gt_url != '' }}
+        run: |
+          python benchmark/eval.py \
+            --gt /tmp/gt --pred /tmp/pred \
+            --cards /tmp/cards.json | tee /tmp/score.txt
+
+      - name: Render visualization (if scored)
+        if: ${{ inputs.gt_url != '' }}
+        run: |
+          curl -sL -o /tmp/visualize.py \
+            https://raw.githubusercontent.com/karanbirsingh/live-gurbani-captioning-benchmark-v1/main/visualize.py
+          python /tmp/visualize.py /tmp/cards.json \
+            --out /tmp/tiles.html \
+            --title "YouTube clip — ${STEM}"
+
+      - name: Dump everything inline
+        # Same pattern as the smoke job — every log + the predictions show up
+        # in the Actions UI directly. Always runs.
+        if: always()
+        run: |
+          echo "::group::Server log (full /tmp/srv.log)"
+          if [ -f /tmp/srv.log ]; then cat /tmp/srv.log; else echo "(no log)"; fi
+          echo "::endgroup::"
+          echo "::group::Predictions JSON"
+          for f in /tmp/pred/*.json; do
+            echo "--- $f ---"
+            cat "$f"
+            echo
+          done
+          echo "::endgroup::"
+          if [ -f /tmp/score.txt ]; then
+            echo "::group::Scorer output"
+            cat /tmp/score.txt
+            echo "::endgroup::"
+          fi
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-run-${{ env.STEM }}
+          path: |
+            /tmp/pred/
+            /tmp/gt/
+            /tmp/srv.log
+            /tmp/cards.json
+            /tmp/tiles.html
+            /tmp/score.txt

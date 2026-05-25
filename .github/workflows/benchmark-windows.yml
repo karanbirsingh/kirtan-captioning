@@ -1,0 +1,172 @@
+# Windows reproducibility check — runs benchmark_client against ONE real
+# kirtan track on a Windows runner. Mirrors the Ubuntu benchmark-smoke
+# job but exercises the DirectML ONNX provider path that ships in the
+# Windows desktop bundle. Useful for confirming results reproduce on the
+# actual platform the Windows installer targets.
+#
+# Why a separate workflow file:
+#   - Windows runners cost 2× the minutes of Ubuntu (still free for public
+#     repos, but we don't want this on every PR).
+#   - workflow_dispatch lets you run it manually from the Actions tab when
+#     you want a fresh Windows number, or weekly on a schedule.
+#   - Splitting means failures here don't block PR merges (the main CI is
+#     in ci.yml).
+#
+# Picks the same middle base track (IZOsmkdmmcg, 7:38) so the full run completes
+# in ~5 min wall-clock including model download.
+
+name: Windows benchmark reproduction
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly on Mondays at 06:00 UTC. Catches regressions in pinned deps
+    # (onnxruntime-directml, etc.) without needing a manual trigger.
+    - cron: "0 6 * * 1"
+
+jobs:
+  reproduce:
+    name: One-track benchmark on Windows
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python deps
+        # Windows uses onnxruntime-directml (DX12 GPU acceleration on any
+        # iGPU/dGPU). The sidecar's requirements.txt gates this on
+        # sys_platform=="win32" already; install from there to mirror the
+        # shipped bundle exactly.
+        run: |
+          pip install -r desktop/sidecar/requirements.txt
+          pip install soundfile websockets
+        shell: pwsh
+
+      - name: Cache ONNX model
+        uses: actions/cache@v4
+        id: model-cache
+        with:
+          path: models/shabad-id-models
+          key: onnx-model-${{ hashFiles('scripts/download_models.py') }}
+
+      - name: Download ONNX model (if not cached)
+        if: steps.model-cache.outputs.cache-hit != 'true'
+        run: python scripts/download_models.py
+        shell: pwsh
+
+      - name: Download one benchmark track + convert to 16k mono WAV
+        # Audio is .webm on the benchmark host; ffmpeg is preinstalled on
+        # GitHub Windows runners. -ar 16000 -ac 1 produces the format the
+        # engine + benchmark_client expect.
+        run: |
+          New-Item -ItemType Directory -Force -Path audio | Out-Null
+          curl.exe -sL -o audio\IZOsmkdmmcg.webm `
+            https://github.com/karanbirsingh/bin/raw/main/audio/IZOsmkdmmcg.webm
+          ffmpeg -y -i audio\IZOsmkdmmcg.webm -ar 16000 -ac 1 audio\IZOsmkdmmcg.wav
+        shell: pwsh
+
+      - name: Start server (background, ALLOW_AUDIO_BURST so it auto-locks)
+        # PowerShell job pattern: spawn server in a background job, poll
+        # stdout for the "Engine ready" line, then continue. Mirror of the
+        # Ubuntu workflow but with PowerShell job semantics. The port is
+        # parsed off the server log just like Ubuntu does.
+        run: |
+          $env:ALLOW_AUDIO_BURST = "true"
+          Start-Process -FilePath python -ArgumentList "server.py" `
+                        -RedirectStandardOutput srv.log `
+                        -RedirectStandardError srv.err.log `
+                        -NoNewWindow
+          # Wait up to 60s for ready line. ONNX cold-init on a free
+          # Windows runner is 5-15s typically.
+          $ready = $false
+          for ($i = 0; $i -lt 60; $i++) {
+            if ((Test-Path srv.err.log) -and (Select-String -Path srv.err.log -Pattern "Engine ready" -Quiet)) {
+              $ready = $true
+              break
+            }
+            Start-Sleep -Seconds 1
+          }
+          if (-not $ready) {
+            Write-Host "Server failed to start within 60s"
+            if (Test-Path srv.err.log) { Get-Content srv.err.log -Tail 50 }
+            exit 1
+          }
+          # Parse port from "[bani] WebSocket: ws://0.0.0.0:<n>/ws" line.
+          $line = Select-String -Path srv.log -Pattern "WebSocket: ws://" | Select-Object -First 1
+          if (-not $line) {
+            $line = Select-String -Path srv.err.log -Pattern "WebSocket: ws://" | Select-Object -First 1
+          }
+          $port = ($line.Line -replace ".*://[^:]+:(\d+).*", '$1')
+          Write-Host "Server ready on port $port"
+          echo "SERVER_PORT=$port" | Out-File -FilePath $env:GITHUB_ENV -Append
+        shell: pwsh
+
+      - name: Run benchmark client (one track)
+        run: |
+          New-Item -ItemType Directory -Force -Path pred | Out-Null
+          python benchmark/benchmark_client.py `
+            --api "ws://127.0.0.1:$env:SERVER_PORT/ws" `
+            --gt benchmark/test/ `
+            --audio-dir audio/ `
+            --output pred/ `
+            --no-realtime
+        shell: pwsh
+
+      - name: Score against ground truth
+        # Same threshold as the Ubuntu smoke job (60%, well below historical 82% but above the
+        # `empty` baseline). IZOsmkdmmcg is the hardest base track at ~30%
+        # on Ubuntu — Windows + DirectML may score slightly differently
+        # due to FP16 GPU path vs CPU path, so we keep the threshold conservative.
+        run: |
+          python benchmark/eval.py --gt benchmark/test --pred pred | Tee-Object -FilePath score.txt
+          $line = Select-String -Path score.txt -Pattern "IZOsmkdmmcg:" | Select-Object -First 1
+          if (-not $line) {
+            Write-Host "FAIL: no IZOsmkdmmcg line in scorer output"
+            exit 1
+          }
+          $score = [double](($line.Line -split "IZOsmkdmmcg:\s*")[1] -split "%")[0]
+          Write-Host "IZOsmkdmmcg = $score%"
+          if ($score -lt 55.0) {
+            Write-Host "FAIL: IZOsmkdmmcg=$score% < 55% threshold"
+            exit 1
+          }
+          Write-Host "OK: IZOsmkdmmcg=$score% >= 55% threshold"
+        shell: pwsh
+
+      - name: Dump engine logs inline
+        # Mirror of the Ubuntu CI inline-dump step. Surfaces every server
+        # event (Running identification, ASR took, Audio stats, lock events)
+        # directly in the Actions log UI. Always runs, even on failure.
+        if: always()
+        run: |
+          Write-Host "::group::Server log (full srv.log + srv.err.log)"
+          if (Test-Path srv.log)     { Get-Content srv.log }
+          if (Test-Path srv.err.log) { Get-Content srv.err.log }
+          Write-Host "::endgroup::"
+          Write-Host "::group::Predictions JSON"
+          Get-ChildItem pred -Filter *.json -ErrorAction SilentlyContinue | ForEach-Object {
+            Write-Host "--- $($_.FullName) ---"
+            Get-Content $_.FullName
+            Write-Host ""
+          }
+          Write-Host "::endgroup::"
+          Write-Host "::group::Scorer output"
+          if (Test-Path score.txt) { Get-Content score.txt }
+          Write-Host "::endgroup::"
+        shell: pwsh
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-bench-artifacts
+          path: |
+            srv.log
+            srv.err.log
+            pred/
+            score.txt

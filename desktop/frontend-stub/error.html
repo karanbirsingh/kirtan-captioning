@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Gurbani Captioning — Startup Error</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+           background: #0a0e1a; color: #e5e7eb; margin: 0; padding: 32px;
+           min-height: 100vh; box-sizing: border-box; }
+    h1 { color: #f87171; font-size: 18px; margin: 0 0 12px; }
+    p { color: #9ca3af; font-size: 14px; line-height: 1.5; margin: 0 0 8px; }
+    .log { background: #111827; border: 1px solid #1f2937; border-radius: 8px;
+           padding: 12px; font-family: ui-monospace, monospace; font-size: 12px;
+           color: #d1d5db; white-space: pre-wrap; word-break: break-word;
+           max-height: 320px; overflow-y: auto; margin: 16px 0; }
+    .btn { display: inline-block; background: #2563eb; color: white;
+           padding: 8px 16px; border-radius: 6px; text-decoration: none;
+           font-size: 14px; cursor: pointer; border: none; }
+    .btn:hover { background: #1d4ed8; }
+    .btn.ghost { background: transparent; border: 1px solid #374151; color: #9ca3af; margin-left: 8px; }
+    .reason { color: #fbbf24; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <h1>⚠ The local engine failed to start</h1>
+  <p>Reason: <span class="reason" id="reason">unknown</span></p>
+  <p>The desktop app couldn't start its local ASR engine. The most common causes are: another copy of the app is already running, the bundled model file is missing or corrupt, or the local port is blocked by another process.</p>
+  <p>Last log output from the engine:</p>
+  <div class="log" id="log">(no output captured)</div>
+  <button class="btn" onclick="window.location.reload()">Retry</button>
+  <a class="btn ghost" id="logLink" target="_blank">Open full log</a>
+  <script>
+    // The shell sets ?reason=… and ?log=… on the URL when it navigates here.
+    const params = new URLSearchParams(location.search);
+    document.getElementById("reason").textContent = params.get("reason") || "unknown";
+    const log = params.get("log");
+    if (log) document.getElementById("log").textContent = log;
+    // The full log path differs per OS but the link is informational only.
+    document.getElementById("logLink").href = params.get("logpath") || "#";
+  </script>
+</body>
+</html>

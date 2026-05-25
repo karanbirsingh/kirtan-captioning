@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Bani Mic — Info.plist additions merged on top of Tauri's default plist.
+
+  Why this file exists in src-tauri/ root:
+    Tauri's bundler automatically picks up `Info.plist` next to
+    `tauri.conf.json` (see v2.tauri.app/reference/config/#macconfig
+    `infoPlist` field doc: "Tauri also looks for a Info.plist file in
+    the same directory as the Tauri configuration file").
+
+  Why each key is here:
+
+    NSMicrophoneUsageDescription
+      REQUIRED for `navigator.mediaDevices.getUserMedia({audio: true})`
+      to work in WKWebView. Without this key, macOS rejects the capture
+      request before our UI delegate ever sees it — even if the private
+      WKPreferences flag `mediaDevicesEnabled` is on (we set that in
+      src/main.rs). The user-facing string here is what shows up in the
+      "App would like to access the microphone" system permission
+      dialog.
+
+    NSCameraUsageDescription
+      Not strictly needed for our app (we only need audio), but
+      WKWebView's permission delegate is `requestMediaCapturePermission
+      ForOrigin:initiatedByFrame:type:decisionHandler:` which can fire
+      with `WKMediaCaptureType.camera` if any future page on the
+      sidecar tries video. Including the key with a benign reason
+      string is a no-op if no video capture is ever attempted, but
+      avoids a TCC crash if it is. Cheaper to declare than to debug.
+
+  NOTE: This plist only takes effect in `cargo tauri build` output
+  (i.e., the .app bundle). In `cargo tauri dev` we run the raw
+  `target/debug/bani-mic-shell` Mach-O and macOS uses ad-hoc
+  permission handling — the runtime KVC flips in src/main.rs are
+  what actually expose `navigator.mediaDevices` in dev mode.
+-->
+<plist version="1.0">
+<dict>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Bani Mic listens to your singing to identify shabads in real time. Audio is processed entirely on your device — nothing is uploaded.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Bani Mic does not currently use the camera, but the WebView reserves this capability for future features.</string>
+</dict>
+</plist>

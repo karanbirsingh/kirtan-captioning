@@ -1,0 +1,113 @@
+{
+  "video_id": "kchMJPK9Axs",
+  "shabad_id": 1341,
+  "segments": [
+    {
+      "start": 25.0,
+      "end": 57.0,
+      "line_idx": 3
+    },
+    {
+      "start": 57.0,
+      "end": 91.0,
+      "line_idx": 4
+    },
+    {
+      "start": 91.0,
+      "end": 97.0,
+      "line_idx": 9
+    },
+    {
+      "start": 97.0,
+      "end": 99.0,
+      "line_idx": 4
+    },
+    {
+      "start": 99.0,
+      "end": 105.0,
+      "line_idx": 9
+    },
+    {
+      "start": 105.0,
+      "end": 111.0,
+      "line_idx": 4
+    },
+    {
+      "start": 111.0,
+      "end": 145.0,
+      "line_idx": 3
+    },
+    {
+      "start": 145.0,
+      "end": 213.0,
+      "line_idx": 1
+    },
+    {
+      "start": 213.0,
+      "end": 247.0,
+      "line_idx": 2
+    },
+    {
+      "start": 247.0,
+      "end": 277.0,
+      "line_idx": 3
+    },
+    {
+      "start": 277.0,
+      "end": 293.0,
+      "line_idx": 5
+    },
+    {
+      "start": 293.0,
+      "end": 295.0,
+      "line_idx": 10
+    },
+    {
+      "start": 295.0,
+      "end": 319.0,
+      "line_idx": 5
+    },
+    {
+      "start": 319.0,
+      "end": 357.0,
+      "line_idx": 6
+    },
+    {
+      "start": 357.0,
+      "end": 401.0,
+      "line_idx": 3
+    },
+    {
+      "start": 401.0,
+      "end": 425.0,
+      "line_idx": 7
+    },
+    {
+      "start": 425.0,
+      "end": 461.0,
+      "line_idx": 8
+    },
+    {
+      "start": 461.0,
+      "end": 507.0,
+      "line_idx": 3
+    },
+    {
+      "start": 507.0,
+      "end": 567.0,
+      "line_idx": 9
+    },
+    {
+      "start": 567.0,
+      "end": 621.0,
+      "line_idx": 10
+    },
+    {
+      "start": 621.0,
+      "end": 650.0,
+      "line_idx": 3
+    }
+  ],
+  "lock_time": 23.0,
+  "mode": "blind"
+}
