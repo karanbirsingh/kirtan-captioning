@@ -59,6 +59,30 @@ from pathlib import Path
 DEFAULT_REGION = "us"  # multi-region; supports chirp_3 + pa-Guru-IN
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# TODO (chunking): Long files (>5 min) cause Chirp 3 to hallucinate and drop
+# whole sections — apparently from language-model context drift. We saw this
+# disappear once audio was split into ~2-minute chunks. This single-file
+# driver does not chunk for you. To add it, write a `chunk_and_transcribe()`
+# helper that:
+#   1. Loads the local wav (or downloads from GCS).
+#   2. Picks split points near silence: compute frame energy, find regions
+#      with RMS in the bottom ~20th percentile lasting ≥0.3s, pick the
+#      silence midpoint closest to each ~120s target boundary so words are
+#      not cut mid-utterance.
+#   3. Writes each chunk to a temp wav, uploads each to GCS, calls
+#      `transcribe_chirp3()` on each chunk in a ThreadPoolExecutor
+#      (3 concurrent is fine; rate-limit yourself to ~50 req/min to stay
+#      under Chirp's quota; retry with backoff on 429).
+#   4. Concatenates the per-chunk word lists, adding each chunk's start
+#      offset to the per-word timestamps so they remain in original-file time.
+#   5. Caches each chunk's result to disk separately so interrupts can resume.
+# A coding assistant (Claude/Cursor) can fill this in cleanly from this spec;
+# the only non-obvious bit is step (4) — words from chunk N must have their
+# `start`/`end` shifted by the chunk's start offset before concatenation.
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 def transcribe_chirp3(
     gcs_uri: str,
     project_id: str,
