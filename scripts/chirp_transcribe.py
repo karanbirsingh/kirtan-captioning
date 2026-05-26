@@ -7,6 +7,12 @@ This is the cheap-data-collection path we used to bulk-transcribe Kirtan audio
 for training: upload audio to GCS once, batch-recognise with chirp_3, cache the
 result JSON locally, and never hit the API again for the same file.
 
+Pricing (Q2 2026):
+    - Dynamic batching   ≈ $0.003/min  (24h SLA, the cheap path; default)
+    - Regular batch      ≈ $0.016/min  (returns synchronously, ~5x more)
+    - Streaming          ≈ $0.024/min  (real-time, not used here)
+    For $300 of dynamic batching you can transcribe roughly 1,600 hours of audio.
+
 Setup:
     1. `pip install google-cloud-speech`
     2. `gcloud auth application-default login`
@@ -16,10 +22,16 @@ Setup:
          gsutil cp my_audio.mp3 gs://my-bucket/my_audio.mp3
 
 Usage:
-    # Transcribe (hits API, caches result):
+    # Transcribe with dynamic batching (24h SLA, $0.003/min, default):
     python chirp_transcribe.py \
         --gcs-uri "gs://my-bucket/my_audio.mp3" \
         --cache cache/my_audio.json
+
+    # Force synchronous batch (~5x more, returns immediately):
+    python chirp_transcribe.py \
+        --gcs-uri "gs://my-bucket/my_audio.mp3" \
+        --cache cache/my_audio.json \
+        --no-dynamic
 
     # Just print cached results (no API call):
     python chirp_transcribe.py \
@@ -29,9 +41,9 @@ Usage:
 Notes:
     - We use `model="chirp_3"` and `language_codes=["pa-Guru-IN"]` for Punjabi
       in the Gurmukhi script. Swap the language code for other Indic targets.
-    - Batch pricing is cheaper than streaming. Chunking long files before
-      upload is a cost/reliability choice (smaller retries on quota errors),
-      not a quality requirement we measured.
+    - Chunking long files before upload is a cost/reliability choice (smaller
+      retries on quota errors, easier resume), not a quality requirement we
+      measured.
 """
 
 import argparse
@@ -49,8 +61,13 @@ def transcribe_chirp3(
     project_id: str,
     region: str = DEFAULT_REGION,
     language: str = "pa-Guru-IN",
+    dynamic_batching: bool = True,
 ) -> dict:
     """Send audio to Chirp 3 BatchRecognize with word-level timestamps.
+
+    With ``dynamic_batching=True`` (default) the request goes on the 24h-SLA
+    dynamic-batching path (~$0.003/min). Otherwise it runs as a regular
+    synchronous batch (~$0.016/min) and blocks until done.
 
     Returns a dict with all results serialised for caching.
     """
@@ -75,7 +92,7 @@ def transcribe_chirp3(
 
     file_metadata = cloud_speech.BatchRecognizeFileMetadata(uri=gcs_uri)
 
-    request = cloud_speech.BatchRecognizeRequest(
+    request_kwargs = dict(
         recognizer=f"projects/{project_id}/locations/{region}/recognizers/_",
         config=config,
         files=[file_metadata],
@@ -83,14 +100,23 @@ def transcribe_chirp3(
             inline_response_config=cloud_speech.InlineOutputConfig(),
         ),
     )
+    if dynamic_batching:
+        request_kwargs["processing_strategy"] = (
+            cloud_speech.BatchRecognizeRequest.ProcessingStrategy.DYNAMIC_BATCHING
+        )
 
+    request = cloud_speech.BatchRecognizeRequest(**request_kwargs)
+
+    mode = "dynamic batching (~$0.003/min, 24h SLA)" if dynamic_batching \
+        else "regular batch (~$0.016/min)"
     print(f"Sending BatchRecognize request for {gcs_uri} ...")
-    print(f"  model=chirp_3  lang={language}  word_timestamps=True")
+    print(f"  model=chirp_3  lang={language}  mode={mode}")
     t0 = time.time()
     operation = client.batch_recognize(request=request)
 
-    print("Waiting for operation to complete ...")
-    response = operation.result(timeout=600)
+    timeout_s = 24 * 3600 if dynamic_batching else 3600
+    print(f"Waiting for operation to complete (timeout {timeout_s // 60} min) ...")
+    response = operation.result(timeout=timeout_s)
     elapsed = time.time() - t0
     print(f"Done in {elapsed:.1f}s")
 
@@ -118,6 +144,7 @@ def transcribe_chirp3(
     cache = {
         "gcs_uri": gcs_uri,
         "model": "chirp_3",
+        "processing_strategy": "dynamic_batching" if dynamic_batching else "batch",
         "language_requested": language,
         "elapsed_seconds": round(elapsed, 1),
         "num_results": len(results),
@@ -132,6 +159,7 @@ def print_results(cache: dict):
     print(f"\n{'=' * 100}")
     print(f"CHIRP 3 TRANSCRIPTION — {cache.get('language_requested', '?')}")
     print(f"  source: {cache.get('gcs_uri', '?')}")
+    print(f"  strategy: {cache.get('processing_strategy', '?')}")
     print(f"  results: {cache.get('num_results', '?')} utterances")
     print(f"  api time: {cache.get('elapsed_seconds', '?')}s")
     print(f"{'=' * 100}")
@@ -162,7 +190,7 @@ def print_results(cache: dict):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Chirp 3 transcription with caching",
+        description="Chirp 3 transcription with caching (dynamic batching by default)",
     )
     parser.add_argument("--gcs-uri", help="GCS URI of audio file (gs://...)")
     parser.add_argument("--cache", required=True, help="Path to cache JSON file")
@@ -172,6 +200,8 @@ def main():
                         help="GCP project id (or set GCP_PROJECT_ID env var)")
     parser.add_argument("--region", default=DEFAULT_REGION,
                         help=f"GCP region (default: {DEFAULT_REGION})")
+    parser.add_argument("--no-dynamic", action="store_true",
+                        help="Disable dynamic batching (use regular batch, ~5x more)")
     parser.add_argument("--print-only", action="store_true",
                         help="Only print cached results, don't call API")
     args = parser.parse_args()
@@ -208,6 +238,7 @@ def main():
         project_id=args.project_id,
         region=args.region,
         language=args.language,
+        dynamic_batching=not args.no_dynamic,
     )
 
     cache_path.parent.mkdir(parents=True, exist_ok=True)
