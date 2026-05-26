@@ -41,9 +41,12 @@ Usage:
 Notes:
     - We use `model="chirp_3"` and `language_codes=["pa-Guru-IN"]` for Punjabi
       in the Gurmukhi script. Swap the language code for other Indic targets.
-    - Chunking long files before upload is a cost/reliability choice (smaller
-      retries on quota errors, easier resume), not a quality requirement we
-      measured.
+    - **Chunk long files before upload.** On 7-minute+ Kirtan files we saw
+      Chirp 3 hallucinate words during instrumental passages and silently
+      drop whole sections, apparently from language-model context drift.
+      Splitting audio at ~2-minute boundaries (ideally at silence points
+      so words aren't cut mid-utterance) eliminated both failure modes in
+      our tests. This single-file driver does not chunk for you.
 """
 
 import argparse
