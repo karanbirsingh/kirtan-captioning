@@ -43,6 +43,25 @@ Same flow as macOS/Linux, with three differences:
 - The Tauri bundler emits an NSIS installer (`.exe`) and an MSI. Both are produced by `cargo tauri build`.
 - The sidecar binary suffix in `binaries/` is `gurbani-captioning-x86_64-pc-windows-msvc.exe` — copy from `dist/gurbani-captioning.exe` produced by PyInstaller. Run `rustc -vV | findstr host` in PowerShell to confirm the triple.
 
+Prerequisites (once): Rust with the **MSVC** toolchain, **Python 3.11+**, **Visual Studio Build Tools** (for `link.exe`), the **WebView2** runtime (preinstalled on Win11), and the Tauri CLI (`cargo install tauri-cli`).
+
+```powershell
+# 1. Build the Python sidecar (pulls onnxruntime-directml on Windows)
+cd desktop\sidecar
+pip install -r requirements.txt
+pip install pyinstaller
+pyinstaller --clean --noconfirm sidecar.spec
+
+# 2. Stage the sidecar with the MSVC target-triple suffix
+#    (confirm the triple with: rustc -vV | findstr host)
+copy dist\gurbani-captioning.exe ..\src-tauri\binaries\gurbani-captioning-x86_64-pc-windows-msvc.exe
+
+# 3. Build the Tauri app
+cd ..\src-tauri
+cargo tauri build
+# -> target\release\bundle\nsis\Gurbani Captioning_<version>_x64-setup.exe
+```
+
 No code signing yet on Windows either — Defender SmartScreen will show an "unrecognized app" warning on first install. Fixed by an EV code-signing cert (~$200/yr), deferred.
 
 ## Architecture notes
