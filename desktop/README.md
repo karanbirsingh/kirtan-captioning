@@ -48,5 +48,5 @@ No code signing yet on Windows either — Defender SmartScreen will show an "unr
 ## Architecture notes
 
 - **Sidecar lifecycle**: Rust shell spawns the sidecar, watches stdout for `BANI_READY port=<n>`, then navigates the WebView. On window close (or app quit, or shell crash), the sidecar self-exits within 2s via the `BANI_SHELL_PID` watchdog. See `src-tauri/src/main.rs`.
-- **No code signing yet**: the bundled `.app` / `.dmg` aren't signed or notarized. On macOS first launch, users see "damaged" — fix in the release notes (`xattr -dr com.apple.quarantine ...`).
+- **Code signing (macOS)**: the released `.dmg` is signed with Developer ID Application (KARANBIR SINGH, KF66U685PK), notarized, and stapled — Apple notary `Accepted` and `spctl` reports `source=Notarized Developer ID`, so it launches with no "damaged"/quarantine warning (even offline). Windows builds remain unsigned (see above).
 - **Logs**: `~/Library/Logs/dev.gurbani.captioning/Gurbani Captioning.log` (macOS) or `%LOCALAPPDATA%\dev.gurbani.captioning\logs\` (Windows). Captures both Rust shell + sidecar stdout/stderr.

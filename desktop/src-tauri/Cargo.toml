@@ -1,6 +1,6 @@
 [package]
 name = "gurbani-captioning-shell"
-version = "0.2.0"
+version = "0.2.1"
 description = "Gurbani Captioning desktop shell — wraps the Python sidecar in a native window"
 authors = ["Karanbir Singh"]
 edition = "2021"
