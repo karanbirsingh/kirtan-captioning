@@ -98,7 +98,8 @@ jobs:
           mkdir -p /tmp/audio
           curl -sL -o /tmp/audio/IZOsmkdmmcg.webm \
             https://github.com/karanbirsingh/bin/raw/main/audio/IZOsmkdmmcg.webm
-          sudo apt-get install -y ffmpeg
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg
           ffmpeg -y -i /tmp/audio/IZOsmkdmmcg.webm -ar 16000 -ac 1 /tmp/audio/IZOsmkdmmcg.wav
           # Also need the cold-start variants' GT to satisfy benchmark_client,
           # but we only want to actually run on the base track. The client
